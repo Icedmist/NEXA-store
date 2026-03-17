@@ -16,7 +16,6 @@ const navItems = {
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Inventory', path: '/inventory', icon: Package },
     { label: 'Staff', path: '/staff', icon: Users },
-    { label: 'Analytics', path: '/analytics', icon: BarChart3 },
     { label: 'Settings', path: '/settings', icon: Settings },
   ],
   cashier: [
@@ -69,12 +68,44 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </header>
 
       {/* Page */}
-      <main className="flex-1 p-4 lg:p-8 pb-24 lg:pb-8">
+      <main className="flex-1 p-4 lg:p-8 lg:ml-64 pb-24 lg:pb-8">
         {children}
       </main>
 
-      {/* Floating bottom nav */}
-      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+      {/* Side navigation for desktop, bottom nav for mobile */}
+      <nav className="fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-64 bg-card/60 backdrop-blur-xl border-r border-border hidden lg:block z-30">
+        <div className="p-4">
+          <div className="space-y-1">
+            {items.map(item => {
+              const active = location.pathname === item.path;
+              return (
+                <button
+                  key={item.path}
+                  onClick={() => navigate(item.path)}
+                  className={`
+                    w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-150
+                    ${active
+                      ? 'text-green-500 bg-green-500/10'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    }
+                  `}
+                >
+                  <item.icon className={`w-4 h-4 ${active ? 'stroke-[2.5] text-green-500' : ''}`} />
+                  <span className="font-medium tracking-tight">{item.label}</span>
+                  {item.label === 'POS' && cartCount > 0 && (
+                    <span className="ml-auto text-[9px] bg-accent text-accent-foreground rounded-full px-1.5 py-0.5 flex items-center justify-center font-medium">
+                      {cartCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      </nav>
+
+      {/* Floating bottom nav for mobile */}
+      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 lg:hidden">
         <div className="flex items-center gap-1 bg-card/70 backdrop-blur-xl border border-border rounded-2xl px-2 py-2 shadow-lg shadow-foreground/5">
           {items.map(item => {
             const active = location.pathname === item.path;
