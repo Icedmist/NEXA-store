@@ -7,20 +7,20 @@ export default function TestimonialsSection() {
   const testimonials = [
     {
       quote: "Even when our shop's fiber goes down during peak hours, our cashiers don't skip a beat. Nexa's offline sync saves us thousands every single month.",
-      name: "Jamie Marshall",
-      company: "Owner, Everyday Retail",
+      name: "Olumide Adebayo",
+      company: "Owner, Lagos Supermart",
       image: "/testimonial-1.png",
     },
     {
       quote: "Generating sheets of QR codes directly from Nexa has completely removed the cost of buying custom barcode labels for our entire inventory stream.",
-      name: "Sarah Chen",
-      company: "Manager, Tech & Trend",
+      name: "Ngozi Chikelu",
+      company: "Manager, aba traders hub",
       image: "/testimonial-2.png",
     },
     {
       quote: "As an admin, provisioned scaling across my 5 separate stores has become trivial. I can see top lines immediately without bothering managers.",
-      name: "Marcus Rodriguez",
-      company: "CFO, InnovateCorp Chains",
+      name: "Emeka Okafor",
+      company: "CFO, Mega Plaza Holdings",
       image: "/testimonial-3.png",
     },
   ]

@@ -123,8 +123,8 @@ export default function LandingPage() {
 
             {/* Navigation */}
             <div className="w-full h-12 sm:h-14 md:h-16 lg:h-[84px] absolute left-0 top-0 flex justify-center items-center z-20 px-6 sm:px-8 md:px-12 lg:px-0">
-              <div className="w-full h-0 absolute left-0 top-6 sm:top-7 md:top-8 lg:top-[42px] border-t border-[rgba(55,50,47,0.12)] shadow-[0px_1px_0px_white]"></div>
-              <div className="w-full max-w-[calc(100%-32px)] sm:max-w-[calc(100%-48px)] md:max-w-[calc(100%-64px)] lg:max-w-[700px] lg:w-[700px] h-10 sm:h-11 md:h-12 py-1.5 sm:py-2 px-3 sm:px-4 md:px-4 pr-2 sm:pr-3 bg-[#F7F5F3] backdrop-blur-sm shadow-[0px_0px_0px_2px_white] overflow-hidden rounded-[50px] flex justify-between items-center relative z-30">
+              <div className="w-full h-0 absolute left-0 top-6 sm:top-7 md:top-8 lg:top-[42px] border-t border-[rgba(55,50,47,0.12)] shadow-[0px_1px_0px_black]"></div>
+              <div className="w-full max-w-[calc(100%-32px)] sm:max-w-[calc(100%-48px)] md:max-w-[calc(100%-64px)] lg:max-w-[700px] lg:w-[700px] h-10 sm:h-11 md:h-12 py-1.5 sm:py-2 px-3 sm:px-4 md:px-4 pr-2 sm:pr-3 bg-[#F7F5F3] backdrop-blur-sm shadow-[0px_0px_0px_2px_black] overflow-hidden rounded-[50px] flex justify-between items-center relative z-30">
                 <div className="flex justify-center items-center">
                   <div className="flex justify-start items-center">
                     <div className="flex flex-col justify-center text-[#2F3037] text-sm sm:text-base md:text-lg lg:text-xl font-medium leading-5 font-sans">
@@ -157,8 +157,8 @@ export default function LandingPage() {
             </div>
 
             {/* Hero Section */}
-            <div className="pt-16 sm:pt-20 md:pt-24 lg:pt-[216px] pb-8 sm:pb-12 md:pb-16 flex flex-col justify-start items-center px-2 sm:px-4 md:px-8 lg:px-0 w-full">
-              <div className="w-full max-w-[937px] lg:w-[937px] flex flex-col justify-center items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6">
+            <div className="relative pt-16 sm:pt-20 md:pt-24 lg:pt-[216px] pb-8 sm:pb-12 md:pb-16 flex flex-col justify-start items-center px-2 sm:px-4 md:px-8 lg:px-0 w-full dot-pattern">
+              <div className="w-full max-w-[937px] lg:w-[937px] flex flex-col justify-center items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 relative z-10">
                 <div className="self-stretch rounded-[3px] flex flex-col justify-center items-center gap-4 sm:gap-5 md:gap-6 lg:gap-8">
                   <div className="w-full max-w-[748px] text-center flex justify-center flex-col text-[#37322F] text-[24px] xs:text-[28px] sm:text-[36px] md:text-[52px] lg:text-[80px] font-normal leading-[1.1] sm:leading-[1.15] md:leading-[1.2] lg:leading-24 font-serif px-2 sm:px-4 md:px-0">
                     Retail management that works offline too
@@ -185,20 +185,18 @@ export default function LandingPage() {
               </div>
 
               {/* Background pattern */}
-              <div className="absolute top-[232px] sm:top-[248px] md:top-[264px] lg:top-[320px] left-1/2 transform -translate-x-1/2 z-0 pointer-events-none">
+              <div className="absolute top-[60px] sm:top-[80px] md:top-[100px] lg:top-[120px] left-1/2 transform -translate-x-1/2 z-0 pointer-events-none">
                 <img
                   src="/mask-group-pattern.svg"
                   alt=""
-                  className="w-[936px] sm:w-[1404px] md:w-[2106px] lg:w-[2808px] h-auto opacity-30 sm:opacity-40 md:opacity-50 mix-blend-multiply"
-                  style={{ filter: "hue-rotate(15deg) saturate(0.7) brightness(1.2)" }}
+                  className="w-[936px] sm:w-[1404px] md:w-[2106px] lg:w-[2808px] h-auto opacity-60 sm:opacity-70"
                 />
               </div>
-
-              {/* Dashboard Bento Feature Grid (Supabase style) */}
+                           {/* Dashboard Bento Feature Grid Content (Light Mode) */}
               <div className="w-full max-w-[1060px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 my-10 sm:my-14 mb-0">
                 
-                {/* Card 1: Core Dashboard (Wide) */}
-                <div className="md:col-span-8 bg-[#0D0F10] text-[#E4E4E5] p-6 sm:p-8 rounded-2xl shadow-2xl border border-[rgba(255,255,255,0.03)] flex flex-col md:flex-row gap-6 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group">
+                {/* Card 1: Core Dashboard (Wide) - DARK THEME because image is dark */}
+                <div className="md:col-span-8 bg-[#0D0F10] text-[#E4E4E5] p-6 sm:p-8 rounded-2xl border border-[rgba(255,255,255,0.05)] flex flex-col md:flex-row gap-6 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group shadow-none">
                   <div className="flex-1 flex flex-col justify-between text-left">
                     <div>
                       <div className="flex items-center gap-2 mb-3">
@@ -207,7 +205,7 @@ export default function LandingPage() {
                         </div>
                         <h4 className="text-xs font-semibold text-[#8C8F93] tracking-wider uppercase font-sans">Command Center</h4>
                       </div>
-                      <h3 className="text-xl sm:text-2xl font-semibold font-sans mb-2 tracking-tight">Multi-Store Dashboard</h3>
+                      <h3 className="text-xl sm:text-2xl font-semibold font-sans mb-2 tracking-tight text-[#E4E4E5]">Multi-Store Dashboard</h3>
                       <p className="text-sm text-[#9BA1A6] font-normal leading-relaxed">The single command center to oversee multiple locations, reconcile cashiers, and view global topline in real-time.</p>
                     </div>
                     <ul className="flex flex-col gap-1 text-[13px] text-[#8C8F93] mt-4">
@@ -216,30 +214,30 @@ export default function LandingPage() {
                       <li className="flex items-center gap-2">✓ Location Data Isolations</li>
                     </ul>
                   </div>
-                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] shadow-lg h-full self-center">
-                    <img src={heroImages[0]} alt="Dashboard" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] h-full self-center">
+                    <img src={heroImages[0]} alt="Dashboard" className="w-full h-full object-cover" />
                   </div>
                 </div>
 
-                {/* Card 2: Inventory */}
-                <div className="md:col-span-4 bg-[#0D0F10] text-[#E4E4E5] p-6 rounded-2xl shadow-xl border border-[rgba(255,255,255,0.03)] flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group">
+                {/* Card 2: Inventory - EXACT BACKGROUND THEME because image is light */}
+                <div className="md:col-span-4 bg-[#F7F5F3] text-[#37322F] p-6 rounded-2xl border border-[rgba(55,50,47,0.12)] flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group shadow-none">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7l-8-4-8 4m16 4l-8 4-8-4m16 4l-8 4-8-4" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <div className="w-5 h-5 rounded-md bg-[rgba(55,50,47,0.04)] flex items-center justify-center border border-[rgba(55,50,47,0.08)]">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7l-8-4-8 4m16 4l-8 4-8-4m16 4l-8 4-8-4" stroke="#49423D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </div>
-                      <h4 className="text-xs font-semibold text-[#8C8F93] uppercase font-sans">Inventory</h4>
+                      <h4 className="text-xs font-semibold text-[#605A57] uppercase font-sans">Inventory</h4>
                     </div>
                     <h3 className="text-lg font-semibold font-sans tracking-tight">Active Stock Alerts</h3>
-                    <p className="text-sm text-[#9BA1A6] font-normal">Track low stock items and triggers sheet printing instantly.</p>
+                    <p className="text-sm text-[#605A57] font-normal">Track low stock items and triggers sheet printing instantly.</p>
                   </div>
-                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] shadow-lg">
-                    <img src={heroImages[1]} alt="Stocks" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(0,0,0,0.04)]">
+                    <img src={heroImages[1]} alt="Stocks" className="w-full h-full object-cover" />
                   </div>
                 </div>
 
-                {/* Card 3: Offline Queue */}
-                <div className="md:col-span-4 bg-[#0D0F10] text-[#E4E4E5] p-6 rounded-2xl shadow-xl border border-[rgba(255,255,255,0.03)] flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[300px] overflow-hidden group">
+                {/* Card 3: Offline Queue - DARK THEME */}
+                <div className="md:col-span-4 bg-[#0D0F10] text-[#E4E4E5] p-6 rounded-2xl border border-[rgba(255,255,255,0.05)] flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[300px] overflow-hidden group shadow-none">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
@@ -247,42 +245,41 @@ export default function LandingPage() {
                       </div>
                       <h4 className="text-xs font-semibold text-[#8C8F93] uppercase font-sans">Outage Resilience</h4>
                     </div>
-                    <h3 className="text-lg font-semibold font-sans tracking-tight">Offline Sync Streams</h3>
+                    <h3 className="text-lg font-semibold font-sans tracking-tight text-[#E4E4E5]">Offline Sync Streams</h3>
                     <p className="text-sm text-[#9BA1A6] font-normal">Transitions sync automatically right after established links.</p>
                   </div>
-                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] shadow-lg">
-                    <img src={heroImages[2]} alt="Queue" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
+                    <img src={heroImages[2]} alt="Queue" className="w-full h-full object-cover" />
                   </div>
                 </div>
 
-                {/* Card 4: Hardware-Free (Description Heavy) */}
-                <div className="md:col-span-8 bg-[#0D0F10] text-[#E4E4E5] p-6 sm:p-8 rounded-2xl shadow-2xl border border-[rgba(255,255,255,0.03)] flex flex-col md:flex-row gap-6 aspect-[16/10] md:aspect-auto md:h-[300px] overflow-hidden group">
+                {/* Card 4: Hardware-Free - EXACT BACKGROUND THEME */}
+                <div className="md:col-span-8 bg-[#F7F5F3] text-[#37322F] p-6 sm:p-8 rounded-2xl border border-[rgba(55,50,47,0.12)] flex flex-col md:flex-row gap-6 aspect-[16/10] md:aspect-auto md:h-[300px] overflow-hidden group shadow-none">
                   <div className="flex-1 flex flex-col justify-between text-left">
                     <div>
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v1m-6.928 2l.5.866M4.072 12H5m1.072 5.134l.5-.866M12 20v-1m6.928-2l-.5-.866M19.928 12h-1m-1.072-5.134l-.5.866" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        <div className="w-5 h-5 rounded-md bg-[rgba(55,50,47,0.04)] flex items-center justify-center border border-[rgba(55,50,47,0.08)]">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v1m-6.928 2l.5.866M4.072 12H5m1.072 5.134l.5-.866M12 20v-1m6.928-2l-.5-.866M19.928 12h-1m-1.072-5.134l-.5.866" stroke="#49423D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </div>
-                        <h4 className="text-xs font-semibold text-[#8C8F93] uppercase font-sans">Zero Overhead</h4>
+                        <h4 className="text-xs font-semibold text-[#605A57] uppercase font-sans">Zero Overhead</h4>
                       </div>
                       <h3 className="text-xl sm:text-2xl font-semibold font-sans mb-2 tracking-tight">Hardware-Free Setup</h3>
-                      <p className="text-sm text-[#9BA1A6] font-normal leading-relaxed">Save thousands on scanner hardware procurement. Scan in-app instantly with any browser loaded camera streams properly.</p>
+                      <p className="text-sm text-[#605A57] font-normal leading-relaxed">Save thousands on scanner hardware procurement. Scan in-app instantly with any browser loaded camera streams properly.</p>
                     </div>
                     <div className="mt-4 flex flex-wrap gap-2">
                       {["No Laser Scanners", "Instant Setup", "Any Device"].map((tag) => (
-                        <span key={tag} className="px-2 py-1 bg-[#1A1D20] rounded-md text-[11px] font-medium text-[#D1D5DB] border border-[rgba(255,255,255,0.05)]">{tag}</span>
+                        <span key={tag} className="px-2 py-1 bg-[rgba(55,50,47,0.04)] rounded-md text-[11px] font-medium text-[#49423D] border border-[rgba(55,50,47,0.08)]">{tag}</span>
                       ))}
                     </div>
                   </div>
-                  <div className="flex-1 h-full flex items-center justify-center bg-[#111314] rounded-xl border border-[rgba(255,255,255,0.03)] relative">
-                    <div className="absolute inset-0 bg-gradient-to-br from-[#1A1D20]/50 to-transparent"></div>
+                  <div className="flex-1 h-full flex items-center justify-center bg-[#EEECEB] rounded-xl border border-[rgba(0,0,0,0.04)] relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[rgba(55,50,47,0.01)] to-transparent"></div>
                     <div className="flex flex-col items-center gap-2">
-                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4zm12 0h4v4h-4v-4z" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M9 12h6m-3-3v6" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
-                      <span className="text-xs text-[#6B7280]">Universal Camera Scanning</span>
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4zm12 0h4v4h-4v-4z" stroke="#605A57" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M9 12h6m-3-3v6" stroke="#605A57" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <span className="text-xs text-[#605A57]">Universal Camera Scanning</span>
                     </div>
                   </div>
                 </div>
-
               </div>
 
               {/* Feature Cards Strip */}

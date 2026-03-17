@@ -117,7 +117,7 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
           N
         </div>
 
-        {/* GitHub - 180° (left) */}
+        {/* Silo - 180° (left) */}
         <div
           style={{
             width: "32px",
@@ -125,22 +125,21 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
             left: `${getPositionOnRing(80, Math.PI).x - 16}px`,
             top: `${getPositionOnRing(80, Math.PI).y - 16}px`,
             position: "absolute",
-            background: "#000000",
+            background: "#1E1B18",
             boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            border: "1px solid rgba(255,255,255,0.1)",
           }}
         >
-          <img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg"
-            alt="GitHub"
-            style={{ width: "18px", height: "18px", filter: "brightness(0) invert(1)" }}
-          />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
 
-        {/* Slack - 0° (right) */}
+        {/* Sync Stream - 0° (right) */}
         <div
           style={{
             width: "32px",
@@ -149,21 +148,20 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
             top: `${getPositionOnRing(80, 0).y - 16}px`,
             position: "absolute",
             background: "#ffffff",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            border: "1px solid rgba(0,0,0,0.05)",
           }}
         >
-          <img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/slack.svg"
-            alt="Slack"
-            style={{ width: "18px", height: "18px" }}
-          />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 11-.57-8.38l5.67-5.67" stroke="#37322F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
 
-        {/* Figma - 315° (top-right) */}
+        {/* Cloud Node - 315° (top-right) */}
         <div
           style={{
             width: "32px",
@@ -171,22 +169,21 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
             left: `${getPositionOnRing(120, -Math.PI / 4).x - 16}px`,
             top: `${getPositionOnRing(120, -Math.PI / 4).y - 16}px`,
             position: "absolute",
-            background: "#EEEFE8",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+            background: "#ffffff",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            border: "1px solid rgba(0,0,0,0.05)",
           }}
         >
-          <img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/figma.svg"
-            alt="Figma"
-            style={{ width: "16px", height: "16px" }}
-          />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M18 10h-1.26A8 8 0 109 20h9a5 5 0 000-10z" stroke="#37322F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
 
-        {/* Discord - 135° (bottom-left) */}
+        {/* Wifi-Off - 135° (bottom-left) */}
         <div
           style={{
             width: "32px",
@@ -194,7 +191,7 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
             left: `${getPositionOnRing(120, (3 * Math.PI) / 4).x - 16}px`,
             top: `${getPositionOnRing(120, (3 * Math.PI) / 4).y - 16}px`,
             position: "absolute",
-            background: "#5865F2",
+            background: "#0D0F10",
             boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
             borderRadius: "50%",
             display: "flex",
@@ -202,14 +199,13 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
             justifyContent: "center",
           }}
         >
-          <img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/discord.svg"
-            alt="Discord"
-            style={{ width: "18px", height: "18px", filter: "brightness(0) invert(1)" }}
-          />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <line x1="1" y1="1" x2="23" y2="23" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
+            <path d="M16.72 11.06A10.94 10.94 0 0119 12.55M5 12.55a10.94 10.94 0 015.17-2.39" stroke="#FFFFFF" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
         </div>
 
-        {/* Notion - 225° */}
+        {/* Database - 225° */}
         <div
           style={{
             width: "32px",
@@ -218,21 +214,22 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
             top: `${getPositionOnRing(120, (5 * Math.PI) / 4).y - 16}px`,
             position: "absolute",
             background: "#ffffff",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            border: "1px solid rgba(0,0,0,0.05)",
           }}
         >
-          <img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/notion.svg"
-            alt="Notion"
-            style={{ width: "18px", height: "18px" }}
-          />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="12" cy="5" rx="9" ry="3" stroke="#37322F" strokeWidth="2"/>
+            <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3" stroke="#37322F" strokeWidth="2"/>
+            <path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5" stroke="#37322F" strokeWidth="2"/>
+          </svg>
         </div>
 
-        {/* Stripe - 180° (left) */}
+        {/* Upload Stream - 180° (left) */}
         <div
           style={{
             width: "32px",
@@ -240,22 +237,21 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
             left: `${getPositionOnRing(160, Math.PI).x - 16}px`,
             top: `${getPositionOnRing(160, Math.PI).y - 16}px`,
             position: "absolute",
-            background: "#635BFF",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+            background: "#ffffff",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            border: "1px solid rgba(0,0,0,0.05)",
           }}
         >
-          <img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/stripe.svg"
-            alt="Stripe"
-            style={{ width: "18px", height: "18px", filter: "brightness(0) invert(1)" }}
-          />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 19V5m0 0l-7 7m7-7l7 7" stroke="#37322F" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </div>
 
-        {/* Framer - 0° (right) */}
+        {/* Terminals - 0° (right) */}
         <div
           style={{
             width: "32px",
@@ -263,19 +259,19 @@ const EffortlessIntegration: React.FC<EffortlessIntegrationProps> = ({ width = 4
             left: `${getPositionOnRing(160, 0).x - 16}px`,
             top: `${getPositionOnRing(160, 0).y - 16}px`,
             position: "absolute",
-            background: "#000000",
-            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.15)",
+            background: "#ffffff",
+            boxShadow: "0px 4px 12px rgba(0, 0, 0, 0.1)",
             borderRadius: "50%",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            border: "1px solid rgba(0,0,0,0.05)",
           }}
         >
-          <img
-            src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/framer.svg"
-            alt="Framer"
-            style={{ width: "16px", height: "16px", filter: "brightness(0) invert(1)" }}
-          />
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="5" y="2" width="14" height="20" rx="2" stroke="#37322F" strokeWidth="2"/>
+            <line x1="12" y1="18" x2="12" y2="18" stroke="#37322F" strokeWidth="2" strokeLinecap="round"/>
+          </svg>
         </div>
 
         <svg style={{ position: "absolute", inset: 0, width: "100%", height: "100%", pointerEvents: "none" }}>
