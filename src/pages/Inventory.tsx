@@ -1,7 +1,8 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useState, useCallback } from 'react';
 import { products as allProducts, categories, Product } from '@/data/demo';
-import { Search, Plus, AlertTriangle, Package, X, Upload, FileSpreadsheet, Check } from 'lucide-react';
+import { Search, Plus, AlertTriangle, Package, X, Upload, FileSpreadsheet, Check, Printer } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 interface CSVRow {
   name: string;
@@ -21,6 +22,9 @@ export default function Inventory() {
   const [csvData, setCsvData] = useState<CSVRow[]>([]);
   const [csvFileName, setCsvFileName] = useState('');
   const [bulkImported, setBulkImported] = useState(false);
+  const [showLabels, setShowLabels] = useState(false);
+  const [selectedForLabels, setSelectedForLabels] = useState<Set<string>>(new Set());
+  const [labelsPrinted, setLabelsPrinted] = useState(false);
 
   const filtered = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase());
@@ -109,6 +113,27 @@ export default function Inventory() {
     }, 1500);
   };
 
+  const toggleLabelSelection = (id: string) => {
+    setSelectedForLabels(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
+  const selectAllForLabels = () => {
+    if (selectedForLabels.size === filtered.length) {
+      setSelectedForLabels(new Set());
+    } else {
+      setSelectedForLabels(new Set(filtered.map(p => p.id)));
+    }
+  };
+
+  const handlePrintLabels = () => {
+    setLabelsPrinted(true);
+    setTimeout(() => setLabelsPrinted(false), 2000);
+  };
+
   return (
     <DashboardLayout>
       <div>
@@ -122,6 +147,13 @@ export default function Inventory() {
             </p>
           </div>
           <div className="flex gap-2">
+            <button
+              onClick={() => setShowLabels(true)}
+              className="flex items-center gap-2 bg-card border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors"
+            >
+              <Printer className="w-4 h-4" />
+              <span className="hidden sm:inline">QR Labels</span>
+            </button>
             <button
               onClick={() => setShowBulk(true)}
               className="flex items-center gap-2 bg-card border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors"
@@ -329,6 +361,72 @@ export default function Inventory() {
                   </div>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* QR Labels modal */}
+        {showLabels && (
+          <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowLabels(false)}>
+            <div className="bg-card rounded-2xl border border-border p-6 w-full max-w-4xl max-h-[80vh] overflow-y-auto animate-scale-in" onClick={e => e.stopPropagation()}>
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-6 gap-4">
+                <div>
+                  <h2 className="text-lg font-medium">QR Labels</h2>
+                  <p className="text-sm text-muted-foreground font-light mt-1">Generate printable QR code sheets</p>
+                </div>
+                <div className="flex gap-2">
+                  <button onClick={selectAllForLabels}
+                    className="px-4 h-10 rounded-xl border border-border bg-card/60 backdrop-blur-md text-sm font-normal hover:bg-muted transition-colors">
+                    {selectedForLabels.size === filtered.length ? 'Deselect All' : 'Select All'}
+                  </button>
+                  <button onClick={handlePrintLabels} disabled={selectedForLabels.size === 0}
+                    className={`flex items-center gap-2 px-4 h-10 rounded-xl text-sm font-medium transition-all
+                      ${selectedForLabels.size > 0
+                        ? 'bg-primary text-primary-foreground hover:shadow-md'
+                        : 'bg-muted text-muted-foreground cursor-not-allowed'
+                      }`}>
+                    {labelsPrinted ? <Check className="w-4 h-4" /> : <Printer className="w-4 h-4" />}
+                    {labelsPrinted ? 'Sent to printer' : `Print ${selectedForLabels.size} labels`}
+                  </button>
+                </div>
+              </div>
+
+              {/* Label grid */}
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+                {filtered.map((product, i) => (
+                  <button
+                    key={product.id}
+                    onClick={() => toggleLabelSelection(product.id)}
+                    className={`
+                      p-4 rounded-xl border text-left transition-all animate-fade-in stagger-${Math.min(i + 1, 6)}
+                      ${selectedForLabels.has(product.id)
+                        ? 'border-primary bg-primary/5'
+                        : 'border-border bg-card/60 backdrop-blur-md hover:border-primary/20'
+                      }
+                    `}
+                  >
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center p-1">
+                        <QRCodeSVG
+                          value={`nexa://${product.qrCode}/${product.id}`}
+                          size={48}
+                          level="M"
+                          bgColor="transparent"
+                        />
+                      </div>
+                      <div className={`
+                        w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors
+                        ${selectedForLabels.has(product.id) ? 'border-primary bg-primary' : 'border-border'}
+                      `}>
+                        {selectedForLabels.has(product.id) && <Check className="w-3 h-3 text-primary-foreground" />}
+                      </div>
+                    </div>
+                    <p className="text-xs font-medium leading-tight">{product.name}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{product.qrCode}</p>
+                    <p className="text-xs tabular-nums mt-1 font-medium">₦{product.price.toLocaleString()}</p>
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         )}

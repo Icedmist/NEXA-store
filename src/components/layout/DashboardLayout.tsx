@@ -15,7 +15,6 @@ const navItems = {
   manager: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Inventory', path: '/inventory', icon: Package },
-    { label: 'Labels', path: '/labels', icon: Tag },
     { label: 'Staff', path: '/staff', icon: Users },
     { label: 'Analytics', path: '/analytics', icon: BarChart3 },
     { label: 'Settings', path: '/settings', icon: Settings },
@@ -86,12 +85,12 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className={`
                   relative flex flex-col items-center gap-0.5 px-3.5 py-1.5 rounded-xl text-[10px] transition-colors duration-150
                   ${active
-                    ? 'bg-primary text-primary-foreground'
+                    ? 'text-green-500'
                     : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                   }
                 `}
               >
-                <item.icon className="w-4 h-4" />
+                <item.icon className={`w-4 h-4 ${active ? 'stroke-[2.5] text-green-500' : ''}`} />
                 <span className="font-medium tracking-tight">{item.label}</span>
                 {item.label === 'POS' && cartCount > 0 && (
                   <span className="absolute -top-1 -right-0.5 text-[9px] bg-accent text-accent-foreground rounded-full w-4 h-4 flex items-center justify-center font-medium">
