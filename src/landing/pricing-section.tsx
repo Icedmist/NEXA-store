@@ -5,8 +5,8 @@ export default function PricingSection() {
 
   const pricing = {
     starter: { monthly: 0, annually: 0 },
-    professional: { monthly: 29, annually: 23 },
-    enterprise: { monthly: 99, annually: 79 },
+    professional: { monthly: "15,000", annually: "12,000" },
+    enterprise: { monthly: "45,000", annually: "39,000" },
   }
 
   return (
@@ -82,12 +82,12 @@ export default function PricingSection() {
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
                   <div className="flex flex-col justify-start items-start gap-1">
                     <div className="relative h-[60px] flex items-center text-[#37322F] text-5xl font-medium leading-[60px] font-serif">
-                      <span className="invisible">${pricing.starter[billingPeriod]}</span>
+                      <span className="invisible">₦{pricing.starter[billingPeriod]}</span>
                       <span className="absolute inset-0 flex items-center transition-all duration-500" style={{ opacity: billingPeriod === "annually" ? 1 : 0, transform: `scale(${billingPeriod === "annually" ? 1 : 0.8})`, filter: `blur(${billingPeriod === "annually" ? 0 : 4}px)` }}>
-                        ${pricing.starter.annually}
+                        ₦{pricing.starter.annually}
                       </span>
                       <span className="absolute inset-0 flex items-center transition-all duration-500" style={{ opacity: billingPeriod === "monthly" ? 1 : 0, transform: `scale(${billingPeriod === "monthly" ? 1 : 0.8})`, filter: `blur(${billingPeriod === "monthly" ? 0 : 4}px)` }}>
-                        ${pricing.starter.monthly}
+                        ₦{pricing.starter.monthly}
                       </span>
                     </div>
                     <div className="text-[#847971] text-sm font-medium font-sans">per {billingPeriod === "monthly" ? "month" : "year"}, per user.</div>
@@ -120,12 +120,12 @@ export default function PricingSection() {
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
                   <div className="flex flex-col justify-start items-start gap-1">
                     <div className="relative h-[60px] flex items-center text-[#F0EFEE] text-5xl font-medium leading-[60px] font-serif">
-                      <span className="invisible">${pricing.professional[billingPeriod]}</span>
+                      <span className="invisible">₦{pricing.professional[billingPeriod]}</span>
                       <span className="absolute inset-0 flex items-center transition-all duration-500" style={{ opacity: billingPeriod === "annually" ? 1 : 0, transform: `scale(${billingPeriod === "annually" ? 1 : 0.8})`, filter: `blur(${billingPeriod === "annually" ? 0 : 4}px)` }}>
-                        ${pricing.professional.annually}
+                        ₦{pricing.professional.annually}
                       </span>
                       <span className="absolute inset-0 flex items-center transition-all duration-500" style={{ opacity: billingPeriod === "monthly" ? 1 : 0, transform: `scale(${billingPeriod === "monthly" ? 1 : 0.8})`, filter: `blur(${billingPeriod === "monthly" ? 0 : 4}px)` }}>
-                        ${pricing.professional.monthly}
+                        ₦{pricing.professional.monthly}
                       </span>
                     </div>
                     <div className="text-[#D2C6BF] text-sm font-medium font-sans">per {billingPeriod === "monthly" ? "month" : "year"}, per user.</div>
@@ -158,12 +158,12 @@ export default function PricingSection() {
                 <div className="self-stretch flex flex-col justify-start items-start gap-2">
                   <div className="flex flex-col justify-start items-start gap-1">
                     <div className="relative h-[60px] flex items-center text-[#37322F] text-5xl font-medium leading-[60px] font-serif">
-                      <span className="invisible">${pricing.enterprise[billingPeriod]}</span>
+                      <span className="invisible">₦{pricing.enterprise[billingPeriod]}</span>
                       <span className="absolute inset-0 flex items-center transition-all duration-500" style={{ opacity: billingPeriod === "annually" ? 1 : 0, transform: `scale(${billingPeriod === "annually" ? 1 : 0.8})`, filter: `blur(${billingPeriod === "annually" ? 0 : 4}px)` }}>
-                        ${pricing.enterprise.annually}
+                        ₦{pricing.enterprise.annually}
                       </span>
                       <span className="absolute inset-0 flex items-center transition-all duration-500" style={{ opacity: billingPeriod === "monthly" ? 1 : 0, transform: `scale(${billingPeriod === "monthly" ? 1 : 0.8})`, filter: `blur(${billingPeriod === "monthly" ? 0 : 4}px)` }}>
-                        ${pricing.enterprise.monthly}
+                        ₦{pricing.enterprise.monthly}
                       </span>
                     </div>
                     <div className="text-[#847971] text-sm font-medium font-sans">per {billingPeriod === "monthly" ? "month" : "year"}, per user.</div>

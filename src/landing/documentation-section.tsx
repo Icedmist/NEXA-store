@@ -20,7 +20,7 @@ export default function DocumentationSection() {
     {
       title: "QR-Driven Inventory & Labels",
       description: "Generate and print A4 sheets of QR code labels.\nTrack inventory levels and receive low stock alerts.",
-      image: "/modern-dashboard-interface-with-data-visualization.jpg",
+      image: "/modern-dashboard-interface-with-data-visualization.png",
     },
     {
       title: "Hardware-Free QR Scanning",
@@ -30,7 +30,7 @@ export default function DocumentationSection() {
     {
       title: "Bulk Data Imports & Exports",
       description: "Upload large inventories via CSV/Excel offline\nand sync without data loss.",
-      image: "/team-collaboration-interface-with-shared-workspace.jpg",
+      image: "/team-collaboration-interface-with-shared-workspace.png",
     },
   ]
 

@@ -104,9 +104,9 @@ export default function LandingPage() {
 
   // Dashboard hero images per active card
   const heroImages = [
-    "/analytics-dashboard-with-charts-graphs-and-data-vi.jpg",
-    "/modern-dashboard-interface-with-data-visualization.jpg",
-    "/data-visualization-dashboard-with-interactive-char.jpg",
+    "/analytics-dashboard-with-charts-graphs-and-data-vi.png",
+    "/modern-dashboard-interface-with-data-visualization.png",
+    "/data-visualization-dashboard-with-interactive-char.png",
   ]
 
   return (
@@ -194,24 +194,95 @@ export default function LandingPage() {
                 />
               </div>
 
-              {/* Dashboard Hero Preview */}
-              <div className="w-full max-w-[960px] lg:w-[960px] pt-2 sm:pt-4 pb-6 sm:pb-8 md:pb-10 px-2 sm:px-4 md:px-6 lg:px-11 flex flex-col justify-center items-center gap-2 relative z-5 my-8 sm:my-12 md:my-16 lg:my-16 mb-0 lg:pb-0">
-                <div className="w-full max-w-[960px] lg:w-[960px] h-[200px] sm:h-[280px] md:h-[450px] lg:h-[695.55px] bg-white shadow-[0px_0px_0px_0.9056603908538818px_rgba(0,0,0,0.08)] overflow-hidden rounded-[6px] sm:rounded-[8px] lg:rounded-[9.06px] flex flex-col justify-start items-start">
-                  <div className="self-stretch flex-1 flex justify-start items-start">
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="relative w-full h-full overflow-hidden">
-                        {heroImages.map((src, index) => (
-                          <div
-                            key={index}
-                            className={`absolute inset-0 transition-all duration-500 ease-in-out ${activeCard === index ? "opacity-100 scale-100 blur-0" : "opacity-0 scale-95 blur-sm"}`}
-                          >
-                            <img src={src} alt="Dashboard preview" className="w-full h-full object-cover" />
-                          </div>
-                        ))}
+              {/* Dashboard Bento Feature Grid (Supabase style) */}
+              <div className="w-full max-w-[1060px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 my-10 sm:my-14 mb-0">
+                
+                {/* Card 1: Core Dashboard (Wide) */}
+                <div className="md:col-span-8 bg-[#0D0F10] text-[#E4E4E5] p-6 sm:p-8 rounded-2xl shadow-2xl border border-[rgba(255,255,255,0.03)] flex flex-col md:flex-row gap-6 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group">
+                  <div className="flex-1 flex flex-col justify-between text-left">
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zm-11 11h7v7H3v-7zm11 0h7v7h-7v-7z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </div>
+                        <h4 className="text-xs font-semibold text-[#8C8F93] tracking-wider uppercase font-sans">Command Center</h4>
                       </div>
+                      <h3 className="text-xl sm:text-2xl font-semibold font-sans mb-2 tracking-tight">Multi-Store Dashboard</h3>
+                      <p className="text-sm text-[#9BA1A6] font-normal leading-relaxed">The single command center to oversee multiple locations, reconcile cashiers, and view global topline in real-time.</p>
+                    </div>
+                    <ul className="flex flex-col gap-1 text-[13px] text-[#8C8F93] mt-4">
+                      <li className="flex items-center gap-2">✓ Cashier Reconciliation</li>
+                      <li className="flex items-center gap-2">✓ Real-time Sales Feed</li>
+                      <li className="flex items-center gap-2">✓ Location Data Isolations</li>
+                    </ul>
+                  </div>
+                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] shadow-lg h-full self-center">
+                    <img src={heroImages[0]} alt="Dashboard" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
+                </div>
+
+                {/* Card 2: Inventory */}
+                <div className="md:col-span-4 bg-[#0D0F10] text-[#E4E4E5] p-6 rounded-2xl shadow-xl border border-[rgba(255,255,255,0.03)] flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7l-8-4-8 4m16 4l-8 4-8-4m16 4l-8 4-8-4" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                      <h4 className="text-xs font-semibold text-[#8C8F93] uppercase font-sans">Inventory</h4>
+                    </div>
+                    <h3 className="text-lg font-semibold font-sans tracking-tight">Active Stock Alerts</h3>
+                    <p className="text-sm text-[#9BA1A6] font-normal">Track low stock items and triggers sheet printing instantly.</p>
+                  </div>
+                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] shadow-lg">
+                    <img src={heroImages[1]} alt="Stocks" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
+                </div>
+
+                {/* Card 3: Offline Queue */}
+                <div className="md:col-span-4 bg-[#0D0F10] text-[#E4E4E5] p-6 rounded-2xl shadow-xl border border-[rgba(255,255,255,0.03)] flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[300px] overflow-hidden group">
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      </div>
+                      <h4 className="text-xs font-semibold text-[#8C8F93] uppercase font-sans">Outage Resilience</h4>
+                    </div>
+                    <h3 className="text-lg font-semibold font-sans tracking-tight">Offline Sync Streams</h3>
+                    <p className="text-sm text-[#9BA1A6] font-normal">Transitions sync automatically right after established links.</p>
+                  </div>
+                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] shadow-lg">
+                    <img src={heroImages[2]} alt="Queue" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  </div>
+                </div>
+
+                {/* Card 4: Hardware-Free (Description Heavy) */}
+                <div className="md:col-span-8 bg-[#0D0F10] text-[#E4E4E5] p-6 sm:p-8 rounded-2xl shadow-2xl border border-[rgba(255,255,255,0.03)] flex flex-col md:flex-row gap-6 aspect-[16/10] md:aspect-auto md:h-[300px] overflow-hidden group">
+                  <div className="flex-1 flex flex-col justify-between text-left">
+                    <div>
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4v1m-6.928 2l.5.866M4.072 12H5m1.072 5.134l.5-.866M12 20v-1m6.928-2l-.5-.866M19.928 12h-1m-1.072-5.134l-.5.866" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        </div>
+                        <h4 className="text-xs font-semibold text-[#8C8F93] uppercase font-sans">Zero Overhead</h4>
+                      </div>
+                      <h3 className="text-xl sm:text-2xl font-semibold font-sans mb-2 tracking-tight">Hardware-Free Setup</h3>
+                      <p className="text-sm text-[#9BA1A6] font-normal leading-relaxed">Save thousands on scanner hardware procurement. Scan in-app instantly with any browser loaded camera streams properly.</p>
+                    </div>
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {["No Laser Scanners", "Instant Setup", "Any Device"].map((tag) => (
+                        <span key={tag} className="px-2 py-1 bg-[#1A1D20] rounded-md text-[11px] font-medium text-[#D1D5DB] border border-[rgba(255,255,255,0.05)]">{tag}</span>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="flex-1 h-full flex items-center justify-center bg-[#111314] rounded-xl border border-[rgba(255,255,255,0.03)] relative">
+                    <div className="absolute inset-0 bg-gradient-to-br from-[#1A1D20]/50 to-transparent"></div>
+                    <div className="flex flex-col items-center gap-2">
+                      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 4h4v4H4V4zm12 0h4v4h-4V4zM4 16h4v4H4v-4zm12 0h4v4h-4v-4z" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><path d="M9 12h6m-3-3v6" stroke="#4B5563" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <span className="text-xs text-[#6B7280]">Universal Camera Scanning</span>
                     </div>
                   </div>
                 </div>
+
               </div>
 
               {/* Feature Cards Strip */}
@@ -420,10 +491,10 @@ export default function LandingPage() {
                     <div className="border-r-0 md:border-r border-[rgba(55,50,47,0.12)] p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6 bg-transparent">
                       <div className="flex flex-col gap-2">
                         <h3 className="text-[#37322F] text-lg sm:text-xl font-semibold leading-tight font-sans">
-                          Plug in your tools
+                          Offline-First Syncing
                         </h3>
                         <p className="text-[#605A57] text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Connect your payment processors, accounting software, and e-commerce platforms with zero friction.
+                          Transactions save locally in a secure silo and stream automatically to your master dashboard as soon as you are reconnected.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex overflow-hidden justify-center items-center relative bg-transparent">
