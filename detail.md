@@ -28,7 +28,6 @@ The system is divided into three functional modules based on the user's responsi
 - **Inventory Control**: Tools to create product categories and manage individual stock items.
 - **Label Generation**: Functionality to generate and print A4 sheets of QR code labels for physical products.
 - **Staff Management**: Ability to create and manage "Cashier" accounts for their specific location.
-- **Local Analytics**: Access to store-specific reports, including daily revenue and "Most Sold" item lists.
 
 ### C. Cashier (Sales Interface)
 

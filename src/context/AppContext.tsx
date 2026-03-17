@@ -21,9 +21,26 @@ interface AppContextType extends AppState {
 const AppContext = createContext<AppContextType | null>(null);
 
 export function AppProvider({ children }: { children: React.ReactNode }) {
-  const [role, setRole] = useState<Role | null>(null);
+  const [role, setRole] = useState<Role | null>(() => {
+    // Load role from localStorage on initial load
+    const saved = localStorage.getItem('nexa-role');
+    return saved ? JSON.parse(saved) : null;
+  });
   const [storeName] = useState('Downtown Flagship');
-  const [cart, setCart] = useState<CartItem[]>([]);
+  const [cart, setCart] = useState<CartItem[]>(() => {
+    // Load cart from localStorage on initial load
+    const saved = localStorage.getItem('nexa-cart');
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  const setRoleWithStorage = useCallback((role: Role | null) => {
+    setRole(role);
+    if (role) {
+      localStorage.setItem('nexa-role', JSON.stringify(role));
+    } else {
+      localStorage.removeItem('nexa-role');
+    }
+  }, []);
 
   const addToCart = useCallback((product: Product) => {
     setCart(prev => {
@@ -47,19 +64,22 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const clearCart = useCallback(() => setCart([]), []);
+  const clearCart = useCallback(() => {
+    setCart([]);
+    localStorage.removeItem('nexa-cart');
+  }, []);
 
   const cartTotal = cart.reduce((sum, i) => sum + i.price * i.qty, 0);
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
   const logout = useCallback(() => {
-    setRole(null);
-    setCart([]);
-  }, []);
+    setRoleWithStorage(null);
+    clearCart();
+  }, [setRoleWithStorage, clearCart]);
 
   return (
     <AppContext.Provider value={{
-      role, setRole, storeName, cart,
+      role, setRole: setRoleWithStorage, storeName, cart,
       addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout
     }}>
       {children}
