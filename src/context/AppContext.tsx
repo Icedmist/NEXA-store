@@ -1,16 +1,14 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Role, CartItem, products as allProducts, Product } from '@/data/demo';
+import { Role, CartItem, Product } from '@/data/demo';
 
 interface AppState {
   role: Role | null;
   storeName: string;
   cart: CartItem[];
-  sidebarOpen: boolean;
 }
 
 interface AppContextType extends AppState {
   setRole: (role: Role | null) => void;
-  setSidebarOpen: (open: boolean) => void;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateCartQty: (productId: string, qty: number) => void;
@@ -26,7 +24,6 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const [role, setRole] = useState<Role | null>(null);
   const [storeName] = useState('Downtown Flagship');
   const [cart, setCart] = useState<CartItem[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const addToCart = useCallback((product: Product) => {
     setCart(prev => {
@@ -58,12 +55,11 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const logout = useCallback(() => {
     setRole(null);
     setCart([]);
-    setSidebarOpen(false);
   }, []);
 
   return (
     <AppContext.Provider value={{
-      role, setRole, storeName, cart, sidebarOpen, setSidebarOpen,
+      role, setRole, storeName, cart,
       addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout
     }}>
       {children}

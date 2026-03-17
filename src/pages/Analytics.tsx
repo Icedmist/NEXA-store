@@ -1,5 +1,5 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { dailyRevenue, topProducts, paymentBreakdown, recentTransactions } from '@/data/demo';
+import { dailyRevenue, topProducts, paymentBreakdown } from '@/data/demo';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Download, TrendingUp, DollarSign, ShoppingBag } from 'lucide-react';
 
@@ -29,33 +29,31 @@ export default function Analytics() {
             <p className="text-sm text-muted-foreground font-light mt-1">Store performance this week</p>
           </div>
           <button onClick={handleExport}
-            className="flex items-center gap-2 bg-card border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors">
+            className="flex items-center gap-2 bg-card/60 backdrop-blur-md border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors">
             <Download className="w-4 h-4" />
             Export CSV
           </button>
         </div>
 
-        {/* Summary cards */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
-          <div className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-1">
+          <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-1">
             <DollarSign className="w-4 h-4 text-muted-foreground mb-3" />
-            <p className="text-2xl font-medium tabular-nums tracking-tight">KES {totalRevenue.toLocaleString()}</p>
+            <p className="text-2xl font-medium tabular-nums tracking-tight">₦{totalRevenue.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground mt-1 font-light">Weekly Revenue</p>
           </div>
-          <div className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-2">
+          <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-2">
             <ShoppingBag className="w-4 h-4 text-muted-foreground mb-3" />
             <p className="text-2xl font-medium tabular-nums tracking-tight">{totalTx.toLocaleString()}</p>
             <p className="text-xs text-muted-foreground mt-1 font-light">Total Transactions</p>
           </div>
-          <div className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-3">
+          <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-3">
             <TrendingUp className="w-4 h-4 text-muted-foreground mb-3" />
-            <p className="text-2xl font-medium tabular-nums tracking-tight">KES {Math.round(totalRevenue / totalTx).toLocaleString()}</p>
+            <p className="text-2xl font-medium tabular-nums tracking-tight">₦{Math.round(totalRevenue / totalTx).toLocaleString()}</p>
             <p className="text-xs text-muted-foreground mt-1 font-light">Avg. Transaction</p>
           </div>
         </div>
 
-        {/* Chart */}
-        <div className="bg-card rounded-xl border border-border p-5 mb-3 animate-fade-in stagger-4">
+        <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 mb-3 animate-fade-in stagger-4">
           <p className="text-sm font-medium mb-4">Daily Revenue</p>
           <div className="h-56">
             <ResponsiveContainer width="100%" height="100%">
@@ -65,7 +63,7 @@ export default function Analytics() {
                 <Tooltip
                   contentStyle={{ background: 'hsl(0 0% 100%)', border: '1px solid hsl(40 10% 90%)', borderRadius: 8, fontSize: 12 }}
                   cursor={{ fill: 'hsl(40 10% 95%)' }}
-                  formatter={(value: number) => [`KES ${value.toLocaleString()}`, 'Revenue']}
+                  formatter={(value: number) => [`₦${value.toLocaleString()}`, 'Revenue']}
                 />
                 <Bar dataKey="revenue" fill="hsl(220 12% 14%)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -73,9 +71,8 @@ export default function Analytics() {
           </div>
         </div>
 
-        {/* Top products + Payment */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
-          <div className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-5">
+          <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-5">
             <p className="text-sm font-medium mb-4">Most Sold Products</p>
             <div className="space-y-3">
               {topProducts.map((p, i) => (
@@ -85,13 +82,13 @@ export default function Analytics() {
                     <p className="text-sm truncate">{p.name}</p>
                     <p className="text-[11px] text-muted-foreground">{p.sold} sold</p>
                   </div>
-                  <p className="text-sm tabular-nums">KES {p.revenue.toLocaleString()}</p>
+                  <p className="text-sm tabular-nums">₦{p.revenue.toLocaleString()}</p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-6">
+          <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-6">
             <p className="text-sm font-medium mb-4">Payment Reconciliation</p>
             <div className="space-y-4">
               {paymentBreakdown.map(p => {
@@ -100,7 +97,7 @@ export default function Analytics() {
                   <div key={p.method}>
                     <div className="flex justify-between text-sm mb-1.5">
                       <span>{p.method}</span>
-                      <span className="tabular-nums text-muted-foreground">{p.count} txns · KES {p.amount.toLocaleString()}</span>
+                      <span className="tabular-nums text-muted-foreground">{p.count} txns · ₦{p.amount.toLocaleString()}</span>
                     </div>
                     <div className="h-1.5 bg-muted rounded-full overflow-hidden">
                       <div className="h-full bg-primary rounded-full" style={{ width: `${(p.amount / total) * 100}%` }} />

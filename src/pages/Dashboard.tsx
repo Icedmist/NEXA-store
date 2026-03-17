@@ -9,7 +9,7 @@ function StatCard({ label, value, change, positive, icon: Icon, delay }: {
   icon: typeof TrendingUp; delay: number;
 }) {
   return (
-    <div className={`bg-card rounded-xl p-5 border border-border animate-fade-in stagger-${delay}`}>
+    <div className={`bg-card/60 backdrop-blur-md rounded-xl p-5 border border-border animate-fade-in stagger-${delay}`}>
       <div className="flex items-start justify-between mb-4">
         <div className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center">
           <Icon className="w-4 h-4 text-muted-foreground" />
@@ -36,17 +36,15 @@ function AdminDashboardContent() {
         <p className="text-sm text-muted-foreground font-light mt-1">Overview across all stores</p>
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Total Revenue" value={`KES ${totalRevenue.toLocaleString()}`} change="12.4%" positive icon={DollarSign} delay={1} />
+        <StatCard label="Total Revenue" value={`₦${totalRevenue.toLocaleString()}`} change="12.4%" positive icon={DollarSign} delay={1} />
         <StatCard label="Transactions" value={totalTransactions.toLocaleString()} change="8.2%" positive icon={ShoppingBag} delay={2} />
         <StatCard label="Active Stores" value={stores.filter(s => s.status === 'active').length.toString()} change="0%" positive icon={Store} delay={3} />
         <StatCard label="Growth Rate" value="14.7%" change="2.1%" positive icon={TrendingUp} delay={4} />
       </div>
 
-      {/* Chart + Stores */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mt-3">
-        <div className="lg:col-span-3 bg-card rounded-xl border border-border p-5 animate-fade-in stagger-5">
+        <div className="lg:col-span-3 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-5">
           <p className="text-sm font-medium mb-4">Weekly Revenue</p>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -56,7 +54,7 @@ function AdminDashboardContent() {
                 <Tooltip
                   contentStyle={{ background: 'hsl(0 0% 100%)', border: '1px solid hsl(40 10% 90%)', borderRadius: 8, fontSize: 12 }}
                   cursor={{ fill: 'hsl(40 10% 95%)' }}
-                  formatter={(value: number) => [`KES ${value.toLocaleString()}`, 'Revenue']}
+                  formatter={(value: number) => [`₦${value.toLocaleString()}`, 'Revenue']}
                 />
                 <Bar dataKey="revenue" fill="hsl(220 12% 14%)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -64,7 +62,7 @@ function AdminDashboardContent() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-card rounded-xl border border-border p-5 animate-fade-in stagger-6">
+        <div className="lg:col-span-2 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-6">
           <p className="text-sm font-medium mb-4">Stores</p>
           <div className="space-y-3">
             {stores.map(store => (
@@ -76,15 +74,14 @@ function AdminDashboardContent() {
                     <p className="text-[11px] text-muted-foreground">{store.location}</p>
                   </div>
                 </div>
-                <p className="text-sm tabular-nums">KES {store.revenue.toLocaleString()}</p>
+                <p className="text-sm tabular-nums">₦{store.revenue.toLocaleString()}</p>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      {/* Recent transactions */}
-      <div className="bg-card rounded-xl border border-border p-5 mt-3 animate-fade-in">
+      <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 mt-3 animate-fade-in">
         <p className="text-sm font-medium mb-4">Recent Transactions</p>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
@@ -102,7 +99,7 @@ function AdminDashboardContent() {
                 <tr key={tx.id} className="border-t border-border">
                   <td className="py-3 text-muted-foreground tabular-nums">{tx.id}</td>
                   <td className="py-3">{tx.items.length} item{tx.items.length > 1 ? 's' : ''}</td>
-                  <td className="py-3 tabular-nums">KES {tx.total.toLocaleString()}</td>
+                  <td className="py-3 tabular-nums">₦{tx.total.toLocaleString()}</td>
                   <td className="py-3">
                     <span className="text-xs bg-muted px-2 py-0.5 rounded-md capitalize">{tx.paymentMethod}</span>
                   </td>
@@ -129,14 +126,14 @@ function ManagerDashboardContent() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Today's Revenue" value={`KES ${todayRevenue.toLocaleString()}`} change="18.3%" positive icon={DollarSign} delay={1} />
+        <StatCard label="Today's Revenue" value={`₦${todayRevenue.toLocaleString()}`} change="18.3%" positive icon={DollarSign} delay={1} />
         <StatCard label="Transactions" value={todayTx.toString()} change="12.1%" positive icon={ShoppingBag} delay={2} />
         <StatCard label="Low Stock Items" value="2" change="Alert" positive={false} icon={TrendingUp} delay={3} />
         <StatCard label="Active Cashiers" value="2" change="On shift" positive icon={Store} delay={4} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mt-3">
-        <div className="lg:col-span-3 bg-card rounded-xl border border-border p-5 animate-fade-in stagger-5">
+        <div className="lg:col-span-3 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-5">
           <p className="text-sm font-medium mb-4">This Week</p>
           <div className="h-48">
             <ResponsiveContainer width="100%" height="100%">
@@ -146,7 +143,7 @@ function ManagerDashboardContent() {
                 <Tooltip
                   contentStyle={{ background: 'hsl(0 0% 100%)', border: '1px solid hsl(40 10% 90%)', borderRadius: 8, fontSize: 12 }}
                   cursor={{ fill: 'hsl(40 10% 95%)' }}
-                  formatter={(value: number) => [`KES ${value.toLocaleString()}`, 'Revenue']}
+                  formatter={(value: number) => [`₦${value.toLocaleString()}`, 'Revenue']}
                 />
                 <Bar dataKey="revenue" fill="hsl(152 30% 42%)" radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -154,20 +151,17 @@ function ManagerDashboardContent() {
           </div>
         </div>
 
-        <div className="lg:col-span-2 bg-card rounded-xl border border-border p-5 animate-fade-in stagger-6">
+        <div className="lg:col-span-2 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-6">
           <p className="text-sm font-medium mb-4">Payment Methods</p>
           <div className="space-y-4">
             {paymentBreakdown.map(p => (
               <div key={p.method}>
                 <div className="flex justify-between text-sm mb-1.5">
                   <span>{p.method}</span>
-                  <span className="tabular-nums text-muted-foreground">KES {p.amount.toLocaleString()}</span>
+                  <span className="tabular-nums text-muted-foreground">₦{p.amount.toLocaleString()}</span>
                 </div>
                 <div className="h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-primary rounded-full transition-all"
-                    style={{ width: `${(p.amount / 130000) * 100}%` }}
-                  />
+                  <div className="h-full bg-primary rounded-full transition-all" style={{ width: `${(p.amount / 130000) * 100}%` }} />
                 </div>
               </div>
             ))}
@@ -180,7 +174,6 @@ function ManagerDashboardContent() {
 
 export default function Dashboard() {
   const { role } = useApp();
-
   return (
     <DashboardLayout>
       {role === 'admin' ? <AdminDashboardContent /> : <ManagerDashboardContent />}
