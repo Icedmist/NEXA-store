@@ -45,7 +45,7 @@ export default function POS() {
               placeholder="Search or scan..."
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="w-full h-10 px-4 rounded-xl border border-border bg-card text-sm font-light mt-3 focus:outline-none focus:ring-2 focus:ring-ring/10"
+              className="w-full h-10 px-4 rounded-xl border border-border bg-card/60 backdrop-blur-md text-sm font-light mt-3 focus:outline-none focus:ring-2 focus:ring-ring/10"
             />
           </div>
           <div className="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 content-start">
@@ -53,18 +53,18 @@ export default function POS() {
               <button
                 key={product.id}
                 onClick={() => addToCart(product)}
-                className={`bg-card rounded-xl border border-border p-3 text-left hover:border-primary/20 hover:shadow-sm transition-all animate-fade-in stagger-${Math.min(i + 1, 6)}`}
+                className={`bg-card/60 backdrop-blur-md rounded-xl border border-border p-3 text-left hover:border-primary/20 hover:shadow-sm transition-all animate-fade-in stagger-${Math.min(i + 1, 6)}`}
               >
                 <span className="text-xl">{product.image}</span>
                 <p className="text-xs font-medium mt-2 leading-tight line-clamp-2">{product.name}</p>
-                <p className="text-sm font-medium tabular-nums mt-1">KES {product.price.toLocaleString()}</p>
+                <p className="text-sm font-medium tabular-nums mt-1">₦{product.price.toLocaleString()}</p>
               </button>
             ))}
           </div>
         </div>
 
         {/* Cart */}
-        <div className="w-full lg:w-80 bg-card rounded-xl border border-border flex flex-col animate-slide-in-left">
+        <div className="w-full lg:w-80 bg-card/60 backdrop-blur-md rounded-xl border border-border flex flex-col animate-slide-in-left">
           <div className="p-4 border-b border-border">
             <div className="flex items-center justify-between">
               <p className="text-sm font-medium">Cart</p>
@@ -85,7 +85,7 @@ export default function POS() {
                 <div key={item.id} className="flex items-center gap-3 p-2 rounded-lg">
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium truncate">{item.name}</p>
-                    <p className="text-xs text-muted-foreground tabular-nums">KES {item.price.toLocaleString()}</p>
+                    <p className="text-xs text-muted-foreground tabular-nums">₦{item.price.toLocaleString()}</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <button onClick={() => updateCartQty(item.id, item.qty - 1)}
@@ -110,7 +110,7 @@ export default function POS() {
           <div className="p-4 border-t border-border space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Total</span>
-              <span className="font-medium tabular-nums text-base">KES {cartTotal.toLocaleString()}</span>
+              <span className="font-medium tabular-nums text-base">₦{cartTotal.toLocaleString()}</span>
             </div>
             <button
               onClick={() => setShowCheckout(true)}
@@ -132,7 +132,7 @@ export default function POS() {
         <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowCheckout(false)}>
           <div className="bg-card rounded-2xl border border-border p-6 w-full max-w-sm animate-scale-in" onClick={e => e.stopPropagation()}>
             <h2 className="text-base font-medium mb-1">Payment</h2>
-            <p className="text-3xl font-medium tabular-nums tracking-tight mb-6">KES {cartTotal.toLocaleString()}</p>
+            <p className="text-3xl font-medium tabular-nums tracking-tight mb-6">₦{cartTotal.toLocaleString()}</p>
             <div className="grid grid-cols-3 gap-2 mb-6">
               {payments.map(p => (
                 <button
@@ -166,12 +166,12 @@ export default function POS() {
               {cart.map(item => (
                 <div key={item.id} className="flex justify-between text-xs py-1">
                   <span>{item.name} ×{item.qty}</span>
-                  <span className="tabular-nums">KES {(item.price * item.qty).toLocaleString()}</span>
+                  <span className="tabular-nums">₦{(item.price * item.qty).toLocaleString()}</span>
                 </div>
               ))}
               <div className="flex justify-between text-sm font-medium pt-2 mt-2 border-t border-border">
                 <span>Total</span>
-                <span className="tabular-nums">KES {cartTotal.toLocaleString()}</span>
+                <span className="tabular-nums">₦{cartTotal.toLocaleString()}</span>
               </div>
               <p className="text-[10px] text-muted-foreground mt-2 capitalize">Paid via {paymentMethod}</p>
             </div>

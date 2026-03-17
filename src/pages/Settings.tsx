@@ -13,18 +13,12 @@ export default function SettingsPage() {
     smtpPort: '587',
     lowStockAlert: true,
     brandColor: '#1e2328',
-    currency: 'KES',
+    currency: 'NGN',
     receiptHeader: 'Thank you for shopping with us!',
   });
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
-
-  const update = (key: string, value: string | boolean) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
-  };
+  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const update = (key: string, value: string | boolean) => setSettings(prev => ({ ...prev, [key]: value }));
 
   return (
     <DashboardLayout>
@@ -35,8 +29,7 @@ export default function SettingsPage() {
         </div>
 
         <div className="space-y-4">
-          {/* General */}
-          <section className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-1">
+          <section className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-1">
             <h2 className="text-sm font-medium mb-4">General</h2>
             <div className="space-y-3">
               <div>
@@ -49,7 +42,7 @@ export default function SettingsPage() {
                   <label className="text-xs text-muted-foreground mb-1 block">Currency</label>
                   <select value={settings.currency} onChange={e => update('currency', e.target.value)}
                     className="w-full h-10 px-4 rounded-xl border border-border bg-background text-sm font-light focus:outline-none focus:ring-2 focus:ring-ring/10">
-                    <option>KES</option>
+                    <option>NGN</option>
                     <option>USD</option>
                     <option>EUR</option>
                     <option>GBP</option>
@@ -67,9 +60,8 @@ export default function SettingsPage() {
             </div>
           </section>
 
-          {/* Email */}
           {role === 'admin' && (
-            <section className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-2">
+            <section className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-2">
               <h2 className="text-sm font-medium mb-4">Email (SMTP)</h2>
               <div className="space-y-3">
                 <div>
@@ -93,31 +85,21 @@ export default function SettingsPage() {
             </section>
           )}
 
-          {/* Alerts */}
-          <section className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-3">
+          <section className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-3">
             <h2 className="text-sm font-medium mb-4">Alerts</h2>
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm">Low stock notifications</p>
                 <p className="text-xs text-muted-foreground font-light">Get emailed when products hit threshold</p>
               </div>
-              <button
-                onClick={() => update('lowStockAlert', !settings.lowStockAlert)}
-                className={`
-                  w-11 h-6 rounded-full transition-colors relative
-                  ${settings.lowStockAlert ? 'bg-primary' : 'bg-muted'}
-                `}
-              >
-                <div className={`
-                  w-5 h-5 rounded-full bg-card absolute top-0.5 transition-transform shadow-sm
-                  ${settings.lowStockAlert ? 'translate-x-5' : 'translate-x-0.5'}
-                `} />
+              <button onClick={() => update('lowStockAlert', !settings.lowStockAlert)}
+                className={`w-11 h-6 rounded-full transition-colors relative ${settings.lowStockAlert ? 'bg-primary' : 'bg-muted'}`}>
+                <div className={`w-5 h-5 rounded-full bg-card absolute top-0.5 transition-transform shadow-sm ${settings.lowStockAlert ? 'translate-x-5' : 'translate-x-0.5'}`} />
               </button>
             </div>
           </section>
 
-          {/* Receipt */}
-          <section className="bg-card rounded-xl border border-border p-5 animate-fade-in stagger-4">
+          <section className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-4">
             <h2 className="text-sm font-medium mb-4">Receipt</h2>
             <div>
               <label className="text-xs text-muted-foreground mb-1 block">Header Message</label>

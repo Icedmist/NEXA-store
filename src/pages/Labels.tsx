@@ -1,7 +1,8 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { products as allProducts } from '@/data/demo';
 import { useState } from 'react';
-import { Printer, QrCode, Check } from 'lucide-react';
+import { Printer, Check } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 
 export default function Labels() {
   const [selected, setSelected] = useState<Set<string>>(new Set());
@@ -38,7 +39,7 @@ export default function Labels() {
           </div>
           <div className="flex gap-2">
             <button onClick={selectAll}
-              className="px-4 h-10 rounded-xl border border-border bg-card text-sm font-normal hover:bg-muted transition-colors">
+              className="px-4 h-10 rounded-xl border border-border bg-card/60 backdrop-blur-md text-sm font-normal hover:bg-muted transition-colors">
               {selected.size === allProducts.length ? 'Deselect All' : 'Select All'}
             </button>
             <button onClick={handlePrint} disabled={selected.size === 0}
@@ -63,13 +64,18 @@ export default function Labels() {
                 p-4 rounded-xl border text-left transition-all animate-fade-in stagger-${Math.min(i + 1, 6)}
                 ${selected.has(product.id)
                   ? 'border-primary bg-primary/5'
-                  : 'border-border bg-card hover:border-primary/20'
+                  : 'border-border bg-card/60 backdrop-blur-md hover:border-primary/20'
                 }
               `}
             >
               <div className="flex items-start justify-between mb-3">
-                <div className="w-12 h-12 bg-muted rounded-lg flex items-center justify-center">
-                  <QrCode className="w-6 h-6 text-muted-foreground" />
+                <div className="w-14 h-14 bg-white rounded-lg flex items-center justify-center p-1">
+                  <QRCodeSVG
+                    value={`nexa://${product.qrCode}/${product.id}`}
+                    size={48}
+                    level="M"
+                    bgColor="transparent"
+                  />
                 </div>
                 <div className={`
                   w-5 h-5 rounded-md border-2 flex items-center justify-center transition-colors
@@ -80,7 +86,7 @@ export default function Labels() {
               </div>
               <p className="text-xs font-medium leading-tight">{product.name}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{product.qrCode}</p>
-              <p className="text-xs tabular-nums mt-1 font-medium">KES {product.price.toLocaleString()}</p>
+              <p className="text-xs tabular-nums mt-1 font-medium">₦{product.price.toLocaleString()}</p>
             </button>
           ))}
         </div>
