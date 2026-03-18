@@ -36,49 +36,47 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const items = navItems[role];
 
   return (
-    <div className="min-h-screen dot-pattern flex flex-col">
+    <div className="min-h-screen bg-background dot-pattern flex flex-col transition-colors duration-500">
       {/* Top bar */}
-      <header className="h-14 bg-card/60 backdrop-blur-xl border-b border-border flex items-center justify-between px-4 lg:px-8 sticky top-0 z-30">
-        <div className="flex items-center gap-2.5">
-          <div className="w-7 h-7 bg-primary rounded-lg flex items-center justify-center">
-            <span className="text-primary-foreground text-[10px] font-semibold tracking-tight">NX</span>
-          </div>
-          <div className="hidden sm:block">
-            <p className="text-sm font-medium tracking-tight leading-none">Nexa Store</p>
-          </div>
-          <div className="h-4 w-px bg-border mx-1 hidden sm:block" />
-          <p className="text-xs text-muted-foreground hidden sm:block">{storeName}</p>
-        </div>
+      <header className="h-16 glass dark:glass border-b border-border/50 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground">
-            {isOnline ? <Wifi className="w-3 h-3 text-success" /> : <WifiOff className="w-3 h-3 text-destructive" />}
-            <span className="hidden sm:inline">{isOnline ? 'Online' : 'Offline'}</span>
+          <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-sm transition-transform hover:rotate-6">
+            <span className="text-primary font-bold text-sm tracking-tight">NX</span>
           </div>
-          <div className="h-4 w-px bg-border" />
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest hidden xs:block">
-            {role === 'admin' ? 'Admin' : role === 'manager' ? 'Manager' : 'Cashier'}
-          </p>
-          <div className="h-4 w-px bg-border hidden xs:block" />
-          <ModeToggle />
+          <div className="flex flex-col">
+            <p className="text-sm font-bold tracking-tight leading-none text-foreground">Nexa Retail</p>
+            <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-1">{storeName}</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-4">
+          <div className="hidden md:flex items-center gap-2 px-3 py-1.5 bg-muted/40 rounded-full border border-border/50">
+            {isOnline ? <Wifi className="w-3.5 h-3.5 text-accent animate-pulse" /> : <WifiOff className="w-3.5 h-3.5 text-destructive" />}
+            <span className="text-[11px] font-semibold">{isOnline ? 'Network Active' : 'Offline Mode'}</span>
+          </div>
+          <div className="h-6 w-px bg-border/50 hidden xs:block" />
+          <div className="scale-90">
+            <ModeToggle />
+          </div>
           <button
             onClick={() => { logout(); navigate('/'); }}
-            className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors"
+            className="group p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all active:scale-90"
             title="Sign out"
           >
-            <LogOut className="w-4 h-4" />
+            <LogOut className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           </button>
         </div>
       </header>
 
-      {/* Page */}
-      <main className="flex-1 p-4 lg:p-8 lg:ml-64 pb-24 lg:pb-8">
+      {/* Page Content */}
+      <main className="flex-1 p-4 lg:p-8 lg:ml-64 pb-24 lg:pb-8 animate-fade-in">
         {children}
       </main>
 
-      {/* Side navigation for desktop, bottom nav for mobile */}
-      <nav className="fixed left-0 top-14 h-[calc(100vh-3.5rem)] w-64 bg-card/60 backdrop-blur-xl border-r border-border hidden lg:block z-30">
-        <div className="p-4">
-          <div className="space-y-1">
+      {/* Side navigation for desktop */}
+      <nav className="fixed left-4 top-20 bottom-4 w-56 glass-card dark:glass border border-border/50 hidden lg:block z-40 rounded-3xl overflow-hidden shadow-2xl">
+        <div className="p-4 flex flex-col h-full">
+          <div className="space-y-2 flex-1">
+            <p className="px-3 text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-4 opacity-60">Menu</p>
             {items.map(item => {
               const active = location.pathname === item.path;
               return (
@@ -86,17 +84,17 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   key={item.path}
                   onClick={() => navigate(item.path)}
                   className={`
-                    w-full flex items-center gap-3 px-3 py-2 rounded-lg text-sm transition-colors duration-150
+                    w-full flex items-center gap-3 px-4 py-3 rounded-2xl text-sm transition-all duration-200 group
                     ${active
-                      ? 'text-green-500 bg-green-500/10'
-                      : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                      ? 'bg-primary text-primary-foreground shadow-lg shadow-primary/20 scale-[1.02]'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-white/10 dark:hover:bg-black/10'
                     }
                   `}
                 >
-                  <item.icon className={`w-4 h-4 ${active ? 'stroke-[2.5] text-green-500' : ''}`} />
-                  <span className="font-medium tracking-tight">{item.label}</span>
+                  <item.icon className={`w-5 h-5 transition-transform group-hover:scale-110 ${active ? 'stroke-[2.5]' : ''}`} />
+                  <span className="font-semibold tracking-tight">{item.label}</span>
                   {item.label === 'POS' && cartCount > 0 && (
-                    <span className="ml-auto text-[9px] bg-accent text-accent-foreground rounded-full px-1.5 py-0.5 flex items-center justify-center font-medium">
+                    <span className="ml-auto text-[10px] bg-accent text-accent-foreground rounded-full w-5 h-5 flex items-center justify-center font-bold animate-bounce">
                       {cartCount}
                     </span>
                   )}
@@ -104,12 +102,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               );
             })}
           </div>
+          <div className="mt-auto px-2">
+            <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
+              <p className="text-[11px] font-bold text-primary uppercase tracking-tighter">Current Session</p>
+              <p className="text-xs text-muted-foreground mt-1 truncate">Role: <span className="text-foreground capitalize">{role}</span></p>
+            </div>
+          </div>
         </div>
       </nav>
 
-      {/* Floating bottom nav for mobile */}
-      <nav className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40 lg:hidden">
-        <div className="flex items-center gap-1 bg-card/70 backdrop-blur-xl border border-border rounded-2xl px-2 py-2 shadow-lg shadow-foreground/5">
+      {/* Floating navigation for mobile */}
+      <nav className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 lg:hidden w-[calc(100%-2rem)] max-w-sm">
+        <div className="flex items-center justify-around glass dark:glass border border-white/20 dark:border-white/10 rounded-3xl px-2 py-3 shadow-2xl">
           {items.map(item => {
             const active = location.pathname === item.path;
             return (
@@ -117,17 +121,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 key={item.path}
                 onClick={() => navigate(item.path)}
                 className={`
-                  relative flex flex-col items-center gap-0.5 px-3.5 py-1.5 rounded-xl text-[10px] transition-colors duration-150
+                  relative flex flex-col items-center gap-1.5 px-4 py-2 rounded-2xl transition-all duration-300
                   ${active
-                    ? 'text-green-500'
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
+                    ? 'text-primary scale-110'
+                    : 'text-muted-foreground hover:text-foreground'
                   }
                 `}
               >
-                <item.icon className={`w-4 h-4 ${active ? 'stroke-[2.5] text-green-500' : ''}`} />
-                <span className="font-medium tracking-tight">{item.label}</span>
+                <item.icon className={`w-5 h-5 ${active ? 'stroke-[2.5]' : ''}`} />
+                <span className="text-[10px] font-bold tracking-tight">{item.label}</span>
+                {active && <span className="absolute -bottom-1 w-1 h-1 bg-primary rounded-full shadow-[0_0_8px_primary]"></span>}
                 {item.label === 'POS' && cartCount > 0 && (
-                  <span className="absolute -top-1 -right-0.5 text-[9px] bg-accent text-accent-foreground rounded-full w-4 h-4 flex items-center justify-center font-medium">
+                  <span className="absolute -top-1 right-2 text-[10px] bg-accent text-accent-foreground rounded-full w-4 h-4 flex items-center justify-center font-bold">
                     {cartCount}
                   </span>
                 )}
