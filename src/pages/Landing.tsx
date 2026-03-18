@@ -540,12 +540,12 @@ export default function LandingPage() {
               <PricingSection />
               <FAQSection />
               <CTASection />
-              <FooterSection />
-            </div>
+            <FooterSection />
           </div>
         </div>
       </div>
     </div>
   );
 }
+
 
