@@ -12,6 +12,21 @@ import PricingSection from "../landing/pricing-section"
 import CTASection from "../landing/cta-section"
 import FooterSection from "../landing/footer-section"
 import { ModeToggle } from "@/components/ModeToggle"
+import { useTheme } from "next-themes"
+import StoreRegistrationSection from "../landing/store-registration"
+
+// Grid Lines Helper Component
+function GridLines() {
+  return (
+    <div className="grid-lines-container">
+      <div className="grid-lines-inner">
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+        <div className="grid-line"></div>
+      </div>
+    </div>
+  )
+}
 
 // Reusable Badge Component
 function Badge({ icon, text }: { icon: React.ReactNode; text: string }) {
@@ -67,6 +82,7 @@ function FeatureCard({
 }
 
 export default function LandingPage() {
+  const { theme } = useTheme()
   const navigate = useNavigate()
   const [activeCard, setActiveCard] = useState(0)
   const [progress, setProgress] = useState(0)
@@ -111,7 +127,8 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="w-full min-h-screen relative bg-[#F7F5F3] dark:bg-background overflow-x-hidden flex flex-col justify-start items-center transition-colors duration-500 scroll-smooth">
+    <div className="w-full min-h-screen relative bg-[#F7F5F3] dark:bg-background overflow-x-hidden flex flex-col justify-start items-center transition-colors duration-500 scroll-smooth grid-background">
+      <GridLines />
       <div className="relative flex flex-col justify-start items-center w-full">
         {/* Main container - now full width */}
         <div className="w-full relative flex flex-col justify-start items-center min-h-screen">
@@ -428,11 +445,11 @@ export default function LandingPage() {
                 </div>
                 <div className="self-stretch flex flex-col lg:flex-row gap-6">
                   <div className="flex-1 flex flex-col gap-6">
-                    <NumbersThatSpeak className="p-6 md:p-8 glass-card dark:glass rounded-2xl border border-[rgba(55,50,47,0.12)] dark:border-white/10" />
-                    <SmartSimpleBrilliant className="p-6 md:p-8 glass-card dark:glass rounded-2xl border border-[rgba(55,50,47,0.12)] dark:border-white/10" />
+                    <NumbersThatSpeak theme={theme as any} className="p-6 md:p-8 glass-card dark:glass rounded-2xl border border-[rgba(55,50,47,0.12)] dark:border-white/10" />
+                    <SmartSimpleBrilliant theme={theme as any} className="p-6 md:p-8 glass-card dark:glass rounded-2xl border border-[rgba(55,50,47,0.12)] dark:border-white/10" />
                   </div>
                   <div className="flex-1">
-                    <YourWorkInSync className="p-6 md:p-8 glass-card dark:glass rounded-2xl h-full border border-[rgba(55,50,47,0.12)] dark:border-white/10" />
+                    <YourWorkInSync theme={theme as any} className="p-6 md:p-8 glass-card dark:glass rounded-2xl h-full border border-[rgba(55,50,47,0.12)] dark:border-white/10" />
                   </div>
                 </div>
               </div>
@@ -462,6 +479,11 @@ export default function LandingPage() {
             <div className="w-full flex justify-center bg-transparent">
               <div className="w-full max-w-7xl">
                 <CTASection />
+              </div>
+            </div>
+            <div className="w-full flex justify-center bg-transparent">
+              <div className="w-full max-w-7xl">
+                <StoreRegistrationSection />
               </div>
             </div>
             <div className="w-full flex justify-center bg-transparent">
