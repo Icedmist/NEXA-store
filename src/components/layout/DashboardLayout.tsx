@@ -5,6 +5,7 @@ import {
   ShoppingCart, Tag, Store, LogOut, Wifi, WifiOff
 } from 'lucide-react';
 import { useState } from 'react';
+import { ModeToggle } from '@/components/ModeToggle';
 
 const navItems = {
   admin: [
@@ -54,9 +55,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <span className="hidden sm:inline">{isOnline ? 'Online' : 'Offline'}</span>
           </div>
           <div className="h-4 w-px bg-border" />
-          <p className="text-[10px] text-muted-foreground uppercase tracking-widest">
+          <p className="text-[10px] text-muted-foreground uppercase tracking-widest hidden xs:block">
             {role === 'admin' ? 'Admin' : role === 'manager' ? 'Manager' : 'Cashier'}
           </p>
+          <div className="h-4 w-px bg-border hidden xs:block" />
+          <ModeToggle />
           <button
             onClick={() => { logout(); navigate('/'); }}
             className="p-2 rounded-lg text-muted-foreground hover:text-destructive hover:bg-destructive/5 transition-colors"
