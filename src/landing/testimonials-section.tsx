@@ -49,8 +49,8 @@ export default function TestimonialsSection() {
   }
 
   return (
-    <div className="w-full border-b border-[rgba(55,50,47,0.12)] flex flex-col justify-center items-center">
-      <div className="self-stretch px-2 overflow-hidden flex justify-start items-center bg-background border border-b border-l-0 border-r-0 border-t-0">
+    <div className="w-full border-b border-[rgba(55,50,47,0.12)] dark:border-white/10 flex flex-col justify-center items-center transition-colors">
+      <div className="self-stretch px-2 overflow-hidden flex justify-start items-center bg-background border border-b border-l-0 border-r-0 border-t-0 dark:border-white/10">
         <div className="flex-1 py-16 md:py-17 flex flex-col md:flex-row justify-center items-end gap-6">
           <div className="self-stretch px-3 md:px-12 justify-center items-start gap-4 flex flex-col md:flex-row">
             <img
@@ -65,7 +65,7 @@ export default function TestimonialsSection() {
             />
             <div className="flex-1 px-6 py-6 overflow-hidden flex flex-col justify-start items-start gap-6 pb-0 pt-0">
               <div
-                className="self-stretch justify-start flex flex-col text-[#49423D] text-2xl md:text-[32px] font-medium leading-10 md:leading-[42px] font-sans h-[200px] md:h-[210px] overflow-hidden line-clamp-5 tracking-tight"
+                className="self-stretch justify-start flex flex-col text-[#49423D] dark:text-white text-2xl md:text-[32px] font-medium leading-10 md:leading-[42px] font-sans h-[200px] md:h-[210px] overflow-hidden line-clamp-5 tracking-tight transition-colors"
                 style={{
                   filter: isTransitioning ? "blur(4px)" : "blur(0px)",
                   transition: "filter 0.7s ease-in-out",
@@ -80,10 +80,10 @@ export default function TestimonialsSection() {
                   transition: "filter 0.7s ease-in-out",
                 }}
               >
-                <div className="self-stretch justify-center flex flex-col text-[rgba(73,66,61,0.90)] text-lg font-medium leading-[26px] font-sans">
+                <div className="self-stretch justify-center flex flex-col text-[rgba(73,66,61,0.90)] dark:text-gray-200 text-lg font-medium leading-[26px] font-sans transition-colors">
                   {testimonials[activeTestimonial].name}
                 </div>
-                <div className="self-stretch justify-center flex flex-col text-[rgba(73,66,61,0.70)] text-lg font-medium leading-[26px] font-sans">
+                <div className="self-stretch justify-center flex flex-col text-[rgba(73,66,61,0.70)] dark:text-gray-400 text-lg font-medium leading-[26px] font-sans transition-colors">
                   {testimonials[activeTestimonial].company}
                 </div>
               </div>
@@ -94,21 +94,21 @@ export default function TestimonialsSection() {
           <div className="pr-6 justify-start items-start gap-[14px] flex">
             <button
               onClick={() => handleNavigationClick((activeTestimonial - 1 + testimonials.length) % testimonials.length)}
-              className="w-9 h-9 shadow-[0px_1px_2px_rgba(0,0,0,0.08)] overflow-hidden rounded-full border border-[rgba(0,0,0,0.15)] justify-center items-center gap-2 flex hover:bg-gray-50 transition-colors"
+              className="w-9 h-9 shadow-[0px_1px_2px_rgba(0,0,0,0.08)] dark:shadow-none overflow-hidden rounded-full border border-[rgba(0,0,0,0.15)] dark:border-white/20 justify-center items-center gap-2 flex hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
             >
               <div className="w-6 h-6 relative overflow-hidden">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M15 18L9 12L15 6" stroke="#46413E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" className="text-[#46413E] dark:text-white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
             </button>
             <button
               onClick={() => handleNavigationClick((activeTestimonial + 1) % testimonials.length)}
-              className="w-9 h-9 shadow-[0px_1px_2px_rgba(0,0,0,0.08)] overflow-hidden rounded-full border border-[rgba(0,0,0,0.15)] justify-center items-center gap-2 flex hover:bg-gray-50 transition-colors"
+              className="w-9 h-9 shadow-[0px_1px_2px_rgba(0,0,0,0.08)] dark:shadow-none overflow-hidden rounded-full border border-[rgba(0,0,0,0.15)] dark:border-white/20 justify-center items-center gap-2 flex hover:bg-gray-50 dark:hover:bg-white/5 transition-colors"
             >
               <div className="w-6 h-6 relative overflow-hidden">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M9 18L15 12L9 6" stroke="#46413E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M9 18L15 12L9 6" stroke="currentColor" className="text-[#46413E] dark:text-white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
                 </svg>
               </div>
             </button>
