@@ -123,10 +123,10 @@ export default function LandingPage() {
           <div className="self-stretch pt-[9px] overflow-hidden border-b border-[rgba(55,50,47,0.06)] flex flex-col justify-center items-center gap-4 sm:gap-6 md:gap-8 lg:gap-[66px] relative z-10">
 
             {/* Navigation */}
-            <div className="w-full h-12 sm:h-14 md:h-16 lg:h-[84px] absolute left-0 top-0 flex justify-center items-center z-20 px-6 sm:px-8 md:px-12 lg:px-0">
-              <div className="w-full h-0 absolute left-0 top-6 sm:top-7 md:top-8 lg:top-[42px] border-t border-[rgba(55,50,47,0.12)] shadow-[0px_1px_0px_black]"></div>
-              <div className="w-full max-w-[calc(100%-32px)] sm:max-w-[calc(100%-48px)] md:max-w-[calc(100%-64px)] lg:max-w-[700px] lg:w-[700px] h-10 sm:h-11 md:h-12 py-1.5 sm:py-2 px-3 sm:px-4 md:px-4 pr-2 sm:pr-3 bg-[#F7F5F3] backdrop-blur-sm shadow-[0px_0px_0px_2px_black] overflow-hidden rounded-[50px] flex justify-between items-center relative z-30">
-                <div className="flex justify-center items-center">
+            <div className="w-full h-12 sm:h-14 md:h-16 lg:h-[84px] fixed left-0 top-0 flex justify-center items-center z-50 px-6 sm:px-8 md:px-12 lg:px-0 pointer-events-none">
+              <div className="w-full h-0 absolute left-0 top-6 sm:top-7 md:top-8 lg:top-[42px] border-t border-[rgba(55,50,47,0.12)] shadow-[0px_1px_0px_black] opacity-0"></div>
+              <div className="w-full max-w-[calc(100%-32px)] sm:max-w-[calc(100%-48px)] md:max-w-[calc(100%-64px)] lg:max-w-[750px] lg:w-[750px] h-11 sm:h-12 md:h-14 py-1.5 sm:py-2 px-4 sm:px-5 md:px-6 bg-white/70 dark:bg-black/40 backdrop-blur-xl border border-white/20 dark:border-white/10 shadow-lg pointer-events-auto rounded-full flex justify-between items-center transition-all duration-300 hover:shadow-xl hover:scale-[1.01]">
+                <div className="flex justify-center items-center gap-6">
                   <div className="flex justify-start items-center">
                     <div className="flex flex-col justify-center text-[#2F3037] text-sm sm:text-base md:text-lg lg:text-xl font-medium leading-5 font-sans">
                       Nexa
@@ -144,15 +144,15 @@ export default function LandingPage() {
                     </div>
                   </div>
                 </div>
-                  <div className="flex items-center gap-2 sm:gap-3">
-                    <ModeToggle />
+                  <div className="flex items-center gap-3">
+                    <div className="scale-90 sm:scale-100">
+                      <ModeToggle />
+                    </div>
                     <div
                       onClick={() => navigate("/login")}
-                      className="px-2 sm:px-3 md:px-[14px] py-1 sm:py-[6px] bg-white shadow-[0px_1px_2px_rgba(55,50,47,0.12)] overflow-hidden rounded-full flex justify-center items-center cursor-pointer hover:bg-[#f0ede9] transition-colors"
+                      className="px-4 sm:px-5 py-1.5 sm:py-2 bg-primary text-primary-foreground shadow-md rounded-full flex justify-center items-center cursor-pointer hover:opacity-90 transition-all active:scale-95 text-xs sm:text-sm font-semibold"
                     >
-                      <div className="flex flex-col justify-center text-[#37322F] text-xs md:text-[13px] font-medium leading-5 font-sans">
-                        Log in
-                      </div>
+                      Log in
                     </div>
                   </div>
                 </div>
@@ -160,30 +160,34 @@ export default function LandingPage() {
             </div>
 
             {/* Hero Section */}
-            <div className="relative pt-16 sm:pt-20 md:pt-24 lg:pt-[216px] pb-8 sm:pb-12 md:pb-16 flex flex-col justify-start items-center px-2 sm:px-4 md:px-8 lg:px-0 w-full dot-pattern">
-              <div className="w-full max-w-[937px] lg:w-[937px] flex flex-col justify-center items-center gap-3 sm:gap-4 md:gap-5 lg:gap-6 relative z-10">
-                <div className="self-stretch rounded-[3px] flex flex-col justify-center items-center gap-4 sm:gap-5 md:gap-6 lg:gap-8">
-                  <div className="w-full max-w-[748px] text-center flex justify-center flex-col text-[#37322F] text-[24px] xs:text-[28px] sm:text-[36px] md:text-[52px] lg:text-[80px] font-normal leading-[1.1] sm:leading-[1.15] md:leading-[1.2] lg:leading-24 font-serif px-2 sm:px-4 md:px-0">
-                    Retail management that works offline too
+            <div className="relative pt-24 sm:pt-32 md:pt-40 lg:pt-[240px] pb-12 sm:pb-20 md:pb-24 flex flex-col justify-start items-center px-4 sm:px-6 md:px-8 lg:px-0 w-full dot-pattern">
+              <div className="w-full max-w-[1000px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 relative z-10 animate-fade-in">
+                <div className="self-stretch flex flex-col justify-center items-center gap-6 sm:gap-8">
+                  <div className="w-full max-w-[850px] text-center flex justify-center flex-col text-[#37322F] dark:text-white text-3xl xs:text-4xl sm:text-5xl md:text-6xl lg:text-[88px] font-bold leading-[1.05] tracking-tight font-serif">
+                    Retail management <span className="text-accent underline decoration-accent/30 underline-offset-8">offline first</span>
                   </div>
-                  <div className="w-full max-w-[506px] text-center flex justify-center flex-col text-[rgba(55,50,47,0.80)] sm:text-lg md:text-xl leading-[1.4] sm:leading-[1.45] md:leading-[1.5] lg:leading-7 font-sans px-2 sm:px-4 md:px-0 lg:text-lg font-medium text-sm">
-                    Run your store with confidence — sell, scan, and track inventory even when the internet goes down.
+                  <div className="w-full max-w-[600px] text-center flex justify-center flex-col text-[#605A57] dark:text-gray-400 sm:text-xl md:text-2xl leading-relaxed font-sans px-2 font-medium">
+                    Run your store with confidence. Sell, scan, and track inventory anywhere, even without internet.
                   </div>
                 </div>
               </div>
 
               {/* CTA Button */}
-              <div className="w-full max-w-[497px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 relative z-10 mt-6 sm:mt-8 md:mt-10 lg:mt-12">
-                <div className="backdrop-blur-[8.25px] flex justify-start items-center gap-4">
+              <div className="w-full max-w-[500px] flex flex-col justify-center items-center gap-8 relative z-10 mt-10 animate-fade-in stagger-2">
+                <div className="flex justify-start items-center gap-4">
                   <div
                     onClick={() => navigate("/login")}
-                    className="h-10 sm:h-11 md:h-12 px-6 sm:px-8 md:px-10 lg:px-12 py-2 sm:py-[6px] relative bg-[#37322F] shadow-[0px_0px_0px_2.5px_rgba(255,255,255,0.08)_inset] overflow-hidden rounded-full flex justify-center items-center cursor-pointer hover:bg-[#2A2520] transition-colors"
+                    className="h-12 sm:h-14 px-10 sm:px-12 py-3 bg-primary text-primary-foreground shadow-2xl rounded-full flex justify-center items-center cursor-pointer hover:scale-105 transition-all duration-300 active:scale-95 group relative overflow-hidden"
                   >
-                    <div className="w-20 sm:w-24 md:w-28 lg:w-44 h-[41px] absolute left-0 top-[-0.5px] bg-gradient-to-b from-[rgba(255,255,255,0)] to-[rgba(0,0,0,0.10)] mix-blend-multiply"></div>
-                    <div className="flex flex-col justify-center text-white text-sm sm:text-base md:text-[15px] font-medium leading-5 font-sans">
-                      Start for free
+                    <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <div className="flex flex-col justify-center text-sm sm:text-base md:text-lg font-bold tracking-wide">
+                      Get Started for Free
                     </div>
                   </div>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <span className="w-2 h-2 rounded-full bg-accent animate-pulse"></span>
+                  Currently in open beta
                 </div>
               </div>
 
@@ -199,60 +203,60 @@ export default function LandingPage() {
               <div className="w-full max-w-[1060px] mx-auto px-4 sm:px-6 md:px-8 relative z-10 grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-5 my-10 sm:my-14 mb-0">
                 
                 {/* Card 1: Core Dashboard (Wide) - DARK THEME because image is dark */}
-                <div className="md:col-span-8 bg-[#0D0F10] text-[#E4E4E5] p-6 sm:p-8 rounded-2xl border border-[rgba(255,255,255,0.05)] flex flex-col md:flex-row gap-6 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group shadow-none">
+                <div className="md:col-span-8 glass-card dark:glass text-[#37322F] dark:text-[#E4E4E5] p-6 sm:p-8 rounded-2xl flex flex-col md:flex-row gap-6 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group shadow-xl">
                   <div className="flex-1 flex flex-col justify-between text-left">
                     <div>
                       <div className="flex items-center gap-2 mb-3">
-                        <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
-                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zm-11 11h7v7H3v-7zm11 0h7v7h-7v-7z" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                        <div className="w-5 h-5 rounded-md bg-accent/10 flex items-center justify-center border border-accent/20">
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 3h7v7H3V3zm11 0h7v7h-7V3zm-11 11h7v7H3v-7zm11 0h7v7h-7v-7z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                         </div>
-                        <h4 className="text-xs font-semibold text-[#8C8F93] tracking-wider uppercase font-sans">Command Center</h4>
+                        <h4 className="text-xs font-semibold text-accent tracking-wider uppercase font-sans">Command Center</h4>
                       </div>
-                      <h3 className="text-xl sm:text-2xl font-semibold font-sans mb-2 tracking-tight text-[#E4E4E5]">Multi-Store Dashboard</h3>
-                      <p className="text-sm text-[#9BA1A6] font-normal leading-relaxed">The single command center to oversee multiple locations, reconcile cashiers, and view global topline in real-time.</p>
+                      <h3 className="text-xl sm:text-2xl font-semibold font-sans mb-2 tracking-tight">Multi-Store Dashboard</h3>
+                      <p className="text-sm opacity-80 font-normal leading-relaxed">The single command center to oversee multiple locations, reconcile cashiers, and view global topline in real-time.</p>
                     </div>
-                    <ul className="flex flex-col gap-1 text-[13px] text-[#8C8F93] mt-4">
+                    <ul className="flex flex-col gap-1 text-[13px] opacity-70 mt-4">
                       <li className="flex items-center gap-2">✓ Cashier Reconciliation</li>
                       <li className="flex items-center gap-2">✓ Real-time Sales Feed</li>
                       <li className="flex items-center gap-2">✓ Location Data Isolations</li>
                     </ul>
                   </div>
-                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)] h-full self-center">
-                    <img src={heroImages[0]} alt="Dashboard" className="w-full h-full object-cover" />
+                  <div className="flex-1 rounded-xl overflow-hidden border border-black/5 dark:border-white/5 h-full self-center shadow-inner">
+                    <img src={heroImages[0]} alt="Dashboard" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   </div>
                 </div>
 
-                {/* Card 2: Inventory - EXACT BACKGROUND THEME because image is light */}
-                <div className="md:col-span-4 bg-[#F7F5F3] text-[#37322F] p-6 rounded-2xl border border-[rgba(55,50,47,0.12)] flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group shadow-none">
+                {/* Card 2: Inventory - GLASS CARD */}
+                <div className="md:col-span-4 glass dark:glass-card text-[#37322F] dark:text-white p-6 rounded-2xl flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[320px] overflow-hidden group shadow-xl transition-all hover:-translate-y-1">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-md bg-[rgba(55,50,47,0.04)] flex items-center justify-center border border-[rgba(55,50,47,0.08)]">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7l-8-4-8 4m16 4l-8 4-8-4m16 4l-8 4-8-4" stroke="#49423D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <div className="w-5 h-5 rounded-md bg-accent/10 flex items-center justify-center border border-accent/20">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M20 7l-8-4-8 4m16 4l-8 4-8-4m16 4l-8 4-8-4" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </div>
-                      <h4 className="text-xs font-semibold text-[#605A57] uppercase font-sans">Inventory</h4>
+                      <h4 className="text-xs font-semibold text-accent uppercase font-sans">Inventory</h4>
                     </div>
                     <h3 className="text-lg font-semibold font-sans tracking-tight">Active Stock Alerts</h3>
-                    <p className="text-sm text-[#605A57] font-normal">Track low stock items and triggers sheet printing instantly.</p>
+                    <p className="text-sm opacity-80 font-normal leading-tight">Track low stock items and triggers sheet printing instantly.</p>
                   </div>
-                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(0,0,0,0.04)]">
-                    <img src={heroImages[1]} alt="Stocks" className="w-full h-full object-cover" />
+                  <div className="flex-1 rounded-xl overflow-hidden border border-black/5 dark:border-white/5 shadow-inner">
+                    <img src={heroImages[1]} alt="Stocks" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   </div>
                 </div>
 
-                {/* Card 3: Offline Queue - DARK THEME */}
-                <div className="md:col-span-4 bg-[#0D0F10] text-[#E4E4E5] p-6 rounded-2xl border border-[rgba(255,255,255,0.05)] flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[300px] overflow-hidden group shadow-none">
+                {/* Card 3: Offline Queue - GLASS CARD */}
+                <div className="md:col-span-4 glass dark:glass-card text-[#37322F] dark:text-white p-6 rounded-2xl flex flex-col gap-4 aspect-[16/10] md:aspect-auto md:h-[300px] overflow-hidden group shadow-xl transition-all hover:-translate-y-1">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 rounded-md bg-[#1C1F22] flex items-center justify-center border border-[rgba(255,255,255,0.1)]">
-                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      <div className="w-5 h-5 rounded-md bg-accent/10 flex items-center justify-center border border-accent/20">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M22 12h-4l-3 9L9 3l-3 9H2" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
                       </div>
-                      <h4 className="text-xs font-semibold text-[#8C8F93] uppercase font-sans">Outage Resilience</h4>
+                      <h4 className="text-xs font-semibold text-accent uppercase font-sans">Outage Resilience</h4>
                     </div>
-                    <h3 className="text-lg font-semibold font-sans tracking-tight text-[#E4E4E5]">Offline Sync Streams</h3>
-                    <p className="text-sm text-[#9BA1A6] font-normal">Transitions sync automatically right after established links.</p>
+                    <h3 className="text-lg font-semibold font-sans tracking-tight">Offline Sync Streams</h3>
+                    <p className="text-sm opacity-80 font-normal">Transitions sync automatically right after established links.</p>
                   </div>
-                  <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
-                    <img src={heroImages[2]} alt="Queue" className="w-full h-full object-cover" />
+                  <div className="flex-1 rounded-xl overflow-hidden border border-black/5 dark:border-white/5 shadow-inner">
+                    <img src={heroImages[2]} alt="Queue" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
                   </div>
                 </div>
 
