@@ -94,7 +94,7 @@ const NumbersThatSpeak: React.FC<NumbersThatSpeakProps> = ({
                           Invoiced Revenue
                         </div>
                         <div style={{ fontFamily: "Inter, sans-serif", fontWeight: 500, fontSize: "18.783px", lineHeight: "20.348px", letterSpacing: "-0.587px", color: "var(--nts-text-primary)", whiteSpace: "pre" }}>
-                          $317,731.00
+                          ₦317,731.00
                         </div>
                       </div>
                     </div>

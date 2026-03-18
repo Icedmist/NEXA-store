@@ -20,7 +20,7 @@ export default function DocumentationSection() {
     {
       title: "QR-Driven Inventory & Labels",
       description: "Generate and print A4 sheets of QR code labels.\nTrack inventory levels and receive low stock alerts.",
-      image: "/modern-dashboard-interface-with-data-visualization.jpg",
+      image: "/modern-dashboard-interface-with-data-visualization.png",
     },
     {
       title: "Hardware-Free QR Scanning",
@@ -30,7 +30,7 @@ export default function DocumentationSection() {
     {
       title: "Bulk Data Imports & Exports",
       description: "Upload large inventories via CSV/Excel offline\nand sync without data loss.",
-      image: "/team-collaboration-interface-with-shared-workspace.jpg",
+      image: "/team-collaboration-interface-with-shared-workspace.png",
     },
   ]
 
@@ -69,64 +69,42 @@ export default function DocumentationSection() {
         </div>
       </div>
 
-      {/* Content Section */}
-      <div className="self-stretch px-4 md:px-9 overflow-hidden flex justify-start items-center">
-        <div className="flex-1 py-8 md:py-11 flex flex-col md:flex-row justify-start items-center gap-6 md:gap-12">
-          {/* Left Column - Feature Cards */}
-          <div className="w-full md:w-auto md:max-w-[400px] flex flex-col justify-center items-center gap-4 order-2 md:order-1">
-            {cards.map((card, index) => {
-              const isActive = index === activeCard
-              return (
-                <div
-                  key={index}
-                  onClick={() => handleCardClick(index)}
-                  className={`w-full overflow-hidden flex flex-col justify-start items-start transition-all duration-300 cursor-pointer ${
-                    isActive
-                      ? "bg-white shadow-[0px_0px_0px_0.75px_#E0DEDB_inset]"
-                      : "border border-[rgba(2,6,23,0.08)]"
-                  }`}
-                >
-                  <div className={`w-full h-0.5 bg-[rgba(50,45,43,0.08)] overflow-hidden ${isActive ? "opacity-100" : "opacity-0"}`}>
-                    <div
-                      key={animationKey}
-                      className="h-0.5 bg-[#322D2B] will-change-transform"
-                      style={{
-                        animation: isActive ? "progressBar 5s linear forwards" : "none",
-                      }}
-                    />
-                  </div>
-                  <div className="px-6 py-5 w-full flex flex-col gap-2">
-                    <div className="self-stretch flex justify-center flex-col text-[#49423D] text-sm font-semibold leading-6 font-sans">
-                      {card.title}
-                    </div>
-                    <div className="self-stretch text-[#605A57] text-[13px] font-normal leading-[22px] font-sans whitespace-pre-line">
-                      {card.description}
-                    </div>
-                  </div>
-                </div>
-              )
-            })}
-          </div>
+      {/* Content Section (Alternating Feature Rows) */}
+      <div className="w-full max-w-[1020px] mx-auto px-4 sm:px-6 md:px-8 flex flex-col gap-12 sm:gap-16 md:gap-20 mt-10 sm:mt-14 mb-14">
+        {cards.map((card, index) => {
+          const isReversed = index % 2 !== 0
+          return (
+            <div 
+              key={index} 
+              className={`flex flex-col ${isReversed ? 'md:flex-row-reverse' : 'md:flex-row'} items-center gap-8 md:gap-16`}
+            >
+              {/* Text side */}
+              <div className="flex-1 flex flex-col items-start text-left gap-3">
+                <span className="text-[10px] font-semibold tracking-wider uppercase text-[#605A57] bg-[rgba(55,50,47,0.04)] px-2.5 py-1 rounded-md border border-[rgba(55,50,47,0.06)]">
+                  {index === 0 ? "Inventory Operations" : index === 1 ? "Seamless POS" : "Data Management"}
+                </span>
+                <h3 className="text-xl sm:text-2xl md:text-3xl font-bold font-sans text-[#37322F] tracking-tight">
+                  {card.title}
+                </h3>
+                <p className="text-sm sm:text-base text-[#605A57] font-normal font-sans leading-relaxed whitespace-pre-line">
+                  {card.description}
+                </p>
 
-          {/* Right Column - Image */}
-          <div className="w-full md:w-auto rounded-lg flex flex-col justify-center items-center gap-2 order-1 md:order-2">
-            <div className="w-full md:w-[580px] h-[250px] md:h-[420px] bg-white shadow-[0px_0px_0px_0.9056603908538818px_rgba(0,0,0,0.08)] overflow-hidden rounded-lg relative">
-              {cards.map((card, index) => (
-                <div
-                  key={index}
-                  className="absolute inset-0 transition-opacity duration-500"
-                  style={{ opacity: activeCard === index ? 1 : 0 }}
-                >
-                  <img
-                    src={card.image}
-                    alt={card.title}
-                    className="w-full h-full object-cover"
+              </div>
+
+              {/* Graphic side with perspective bounding frame to fit crisp scale */}
+              <div className="flex-1 w-full max-w-[480px] bg-[#F9F8F6] p-4 sm:p-6 rounded-2xl border border-[rgba(55,50,47,0.08)]">
+                <div className="w-full aspect-[4/3] rounded-xl overflow-hidden shadow-md border border-[rgba(0,0,0,0.04)]">
+                  <img 
+                    src={card.image} 
+                    alt={card.title} 
+                    className="w-full h-full object-cover" 
                   />
                 </div>
-              ))}
+              </div>
             </div>
-          </div>
-        </div>
+          )
+        })}
       </div>
 
       <style>{`
