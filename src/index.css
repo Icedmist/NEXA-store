@@ -112,10 +112,17 @@
   }
 }
 
-/* Dot pattern background */
+/* Hexagonal dot pattern background */
 .dot-pattern {
-  background-image: radial-gradient(circle, hsl(220 10% 82%) 0.8px, transparent 0.8px);
-  background-size: 20px 20px;
+  background-image: radial-gradient(circle, hsl(220 10% 82%) 0.8px, transparent 0.8px),
+                    radial-gradient(circle, hsl(220 10% 82%) 0.8px, transparent 0.8px);
+  background-size: 32px 32px;
+  background-position: 0 0, 16px 16px;
+}
+
+.dark .dot-pattern {
+  background-image: radial-gradient(circle, rgba(255, 255, 255, 0.1) 0.8px, transparent 0.8px),
+                    radial-gradient(circle, rgba(255, 255, 255, 0.1) 0.8px, transparent 0.8px);
 }
 
 /* Animations */

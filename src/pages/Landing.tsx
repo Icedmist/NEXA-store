@@ -127,7 +127,7 @@ export default function LandingPage() {
   ]
 
   return (
-    <div className="w-full min-h-screen relative bg-[#F7F5F3] dark:bg-background overflow-x-hidden flex flex-col justify-start items-center transition-colors duration-500 scroll-smooth grid-background">
+    <div className="w-full min-h-screen relative bg-[#F7F5F3] dark:bg-background overflow-x-hidden flex flex-col justify-start items-center transition-colors duration-500 scroll-smooth grid-background dot-pattern">
       <GridLines />
       <div className="relative flex flex-col justify-start items-center w-full">
         {/* Main container - now full width */}
@@ -177,7 +177,7 @@ export default function LandingPage() {
           <div className="w-full flex flex-col items-center">
 
             {/* Hero Section */}
-            <div className="relative pt-24 sm:pt-32 md:pt-40 lg:pt-[220px] pb-12 sm:pb-20 md:pb-24 flex flex-col justify-start items-center px-4 sm:px-6 md:px-8 lg:px-0 w-full dot-pattern">
+            <div className="relative pt-24 sm:pt-32 md:pt-40 lg:pt-[220px] pb-12 sm:pb-20 md:pb-24 flex flex-col justify-start items-center px-4 sm:px-6 md:px-8 lg:px-0 w-full">
               {/* Subtle background glow */}
               <div className="absolute top-1/4 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-accent/5 blur-[120px] rounded-full pointer-events-none z-0 px-10"></div>
               

@@ -1,9 +1,30 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Store, Mail, Lock, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Store, Mail, Lock, ShieldCheck, Loader2 } from 'lucide-react';
+import { useApp } from '@/context/AppContext';
 
 export default function StoreRegistrationSection() {
   const navigate = useNavigate();
+  const { registerStore } = useApp();
+  const [loading, setLoading] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: ''
+  });
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await registerStore(formData.name, formData.email);
+      navigate('/dashboard');
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section id="register" className="w-full py-24 sm:py-32 flex justify-center relative overflow-hidden">
@@ -57,7 +78,7 @@ export default function StoreRegistrationSection() {
                 <p className="text-sm text-[#605A57] dark:text-gray-400 mt-1">Free 14-day trial, no credit card required.</p>
               </div>
 
-              <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); navigate('/login'); }}>
+              <form className="space-y-5" onSubmit={handleSubmit}>
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-[#605A57] dark:text-gray-500 ml-1">Store Name</label>
                   <div className="relative group">
@@ -65,6 +86,8 @@ export default function StoreRegistrationSection() {
                     <input 
                       type="text" 
                       placeholder="e.g. Vintage Vault" 
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       className="w-full h-12 pl-11 pr-4 bg-white/50 dark:bg-white/5 border border-[rgba(55,50,47,0.12)] dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium"
                       required
                     />
@@ -78,6 +101,8 @@ export default function StoreRegistrationSection() {
                     <input 
                       type="email" 
                       placeholder="admin@yourstore.com" 
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       className="w-full h-12 pl-11 pr-4 bg-white/50 dark:bg-white/5 border border-[rgba(55,50,47,0.12)] dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium"
                       required
                     />
@@ -91,6 +116,8 @@ export default function StoreRegistrationSection() {
                     <input 
                       type="password" 
                       placeholder="••••••••" 
+                      value={formData.password}
+                      onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                       className="w-full h-12 pl-11 pr-4 bg-white/50 dark:bg-white/5 border border-[rgba(55,50,47,0.12)] dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium"
                       required
                     />
@@ -99,10 +126,20 @@ export default function StoreRegistrationSection() {
 
                 <button 
                   type="submit"
-                  className="w-full h-13 mt-4 bg-primary text-primary-foreground rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary/10"
+                  disabled={loading}
+                  className="w-full h-13 mt-4 bg-primary text-primary-foreground rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Create Store Account
-                  <ArrowRight className="w-4 h-4" />
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Creating Account...
+                    </>
+                  ) : (
+                    <>
+                      Create Store Account
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
                 </button>
                 
                 <p className="text-center text-[10px] text-[#605A57] dark:text-gray-500 mt-4 leading-relaxed px-4">
