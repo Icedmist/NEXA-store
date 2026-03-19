@@ -206,3 +206,30 @@ button {
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
+
+/* Fluid Grid Background */
+.grid-background {
+  background-image: 
+    linear-gradient(to right, rgba(55,50,47,0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(55,50,47,0.05) 1px, transparent 1px);
+  background-size: 25% 100px;
+}
+
+.dark .grid-background {
+  background-image: 
+    linear-gradient(to right, rgba(255,255,255,0.03) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255,255,255,0.03) 1px, transparent 1px);
+}
+
+/* Vertical Grid Lines Overlay */
+.grid-lines-container {
+  @apply pointer-events-none fixed inset-0 z-0 flex justify-center overflow-hidden;
+}
+
+.grid-lines-inner {
+  @apply w-full max-w-7xl h-full border-l border-r border-[rgba(55,50,47,0.05)] dark:border-white/5 flex justify-between;
+}
+
+.grid-line {
+  @apply w-px h-full bg-[rgba(55,50,47,0.05)] dark:bg-white/5;
+}
