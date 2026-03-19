@@ -16,6 +16,7 @@ interface AppContextType extends AppState {
   cartTotal: number;
   cartCount: number;
   logout: () => void;
+  registerStore: (name: string, email: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
@@ -26,7 +27,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     const saved = localStorage.getItem('nexa-role');
     return saved ? JSON.parse(saved) : null;
   });
-  const [storeName] = useState('Downtown Flagship');
+  const [storeName, setStoreName] = useState('Downtown Flagship');
   const [cart, setCart] = useState<CartItem[]>(() => {
     // Load cart from localStorage on initial load
     const saved = localStorage.getItem('nexa-cart');
@@ -77,10 +78,18 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     clearCart();
   }, [setRoleWithStorage, clearCart]);
 
+  const registerStore = useCallback(async (name: string, email: string) => {
+    // Simulate API call
+    await new Promise(resolve => setTimeout(resolve, 800));
+    setStoreName(name);
+    setRoleWithStorage('admin');
+  }, [setStoreName, setRoleWithStorage]);
+
   return (
     <AppContext.Provider value={{
       role, setRole: setRoleWithStorage, storeName, cart,
-      addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout
+      addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout,
+      registerStore
     }}>
       {children}
     </AppContext.Provider>
