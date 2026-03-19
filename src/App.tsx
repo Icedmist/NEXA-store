@@ -16,6 +16,7 @@ import POS from "./pages/POS";
 import Scanner from "./pages/Scanner";
 import Labels from "./pages/Labels";
 import Stores from "./pages/Stores";
+import StoreManagement from "./pages/StoreManagement";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/scanner" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
               <Route path="/labels" element={<ProtectedRoute><Labels /></ProtectedRoute>} />
               <Route path="/stores" element={<ProtectedRoute><Stores /></ProtectedRoute>} />
+              <Route path="/stores/:id/manage" element={<ProtectedRoute><StoreManagement /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>

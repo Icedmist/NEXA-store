@@ -112,8 +112,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
   };
 
   const updateStore = (id: string, updates: Partial<Store>) => {
+    const store = stores.find(s => s.id === id);
     setStores(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
-    logActivity(`Store "${id}" updated`, 'Admin');
+    logActivity(`Store "${store?.name}" updated`, 'Admin', id);
   };
 
   const addStaff = (member: Omit<StaffMember, 'id' | 'initials'>) => {
