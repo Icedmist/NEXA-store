@@ -2,7 +2,7 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
 import { TrendingUp, DollarSign, ShoppingBag, Store, ArrowUpRight, ArrowDownRight, Download, Users, Package, Bell, ClipboardList } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, Legend } from 'recharts';
-import { stores, dailyRevenue, paymentBreakdown, recentTransactions, topProducts, profitAndLoss, storeActivities } from '@/data/demo';
+import { dailyRevenue, paymentBreakdown, recentTransactions, topProducts, profitAndLoss, storeActivities as mockActivities } from '@/data/demo';
 
 function StatCard({ label, value, change, positive, icon: Icon, delay }: {
   label: string; value: string; change: string; positive: boolean;
@@ -81,6 +81,7 @@ function PnLChart() {
 }
 
 function AdminDashboardContent() {
+  const { stores, notifications } = useApp();
   const totalRevenue = stores.reduce((s, st) => s + st.revenue, 0);
   const totalTransactions = stores.reduce((s, st) => s + st.transactions, 0);
 
@@ -102,12 +103,31 @@ function AdminDashboardContent() {
         <div className="lg:col-span-3">
           <PnLChart />
         </div>
-        <div className="lg:col-span-2 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-8">
-          <p className="text-sm font-medium mb-4">Multi-Store Activities</p>
+        <div className="lg:col-span-2 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-8 max-h-[400px] overflow-y-auto">
+          <p className="text-sm font-medium mb-4">Global Activity Feed</p>
           <div className="space-y-1">
-            {storeActivities.map(activity => (
-              <ActivityItem key={activity.id} activity={activity} />
-            ))}
+            {notifications.length > 0 ? (
+              notifications.map(activity => (
+                <div key={activity.id} className="flex items-start gap-4 py-3 border-b border-border last:border-0">
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                    <Bell className="w-4 h-4 text-primary" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start">
+                      <p className="text-sm font-medium truncate">{activity.action}</p>
+                      <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-2">{activity.time}</span>
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      {activity.store} • {activity.user}
+                    </p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              mockActivities.map(activity => (
+                <ActivityItem key={activity.id} activity={activity} />
+              ))
+            )}
           </div>
         </div>
       </div>

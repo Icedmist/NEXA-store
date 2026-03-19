@@ -8,6 +8,7 @@ export interface Store {
   status: 'active' | 'inactive';
   revenue: number;
   transactions: number;
+  managerId?: string;
 }
 
 export interface Product {
@@ -28,6 +29,8 @@ export interface StaffMember {
   role: 'cashier' | 'manager';
   status: 'active' | 'inactive';
   initials: string;
+  storeId?: string;
+  password?: string;
 }
 
 export interface Transaction {
@@ -44,7 +47,7 @@ export interface CartItem extends Product {
 }
 
 export const stores: Store[] = [
-  { id: 's1', name: 'Downtown Flagship', location: 'Nairobi CBD', code: 'NX-4821', status: 'active', revenue: 284700, transactions: 1243 },
+  { id: 's1', name: 'Downtown Flagship', location: 'Nairobi CBD', code: 'NX-4821', status: 'active', revenue: 284700, transactions: 1243, managerId: 'st3' },
   { id: 's2', name: 'Westlands Branch', location: 'Westlands', code: 'NX-7193', status: 'active', revenue: 198340, transactions: 876 },
   { id: 's3', name: 'Mombasa Outlet', location: 'Mombasa', code: 'NX-3056', status: 'inactive', revenue: 45200, transactions: 234 },
 ];
@@ -65,10 +68,10 @@ export const products: Product[] = [
 ];
 
 export const staff: StaffMember[] = [
-  { id: 'st1', name: 'Amina Osei', email: 'amina@nexa.co', role: 'cashier', status: 'active', initials: 'AO' },
-  { id: 'st2', name: 'Brian Kamau', email: 'brian@nexa.co', role: 'cashier', status: 'active', initials: 'BK' },
-  { id: 'st3', name: 'Clara Wanjiku', email: 'clara@nexa.co', role: 'manager', status: 'active', initials: 'CW' },
-  { id: 'st4', name: 'David Otieno', email: 'david@nexa.co', role: 'cashier', status: 'inactive', initials: 'DO' },
+  { id: 'st1', name: 'Amina Osei', email: 'amina@nexa.co', role: 'cashier', status: 'active', initials: 'AO', storeId: 's1', password: 'password123' },
+  { id: 'st2', name: 'Brian Kamau', email: 'brian@nexa.co', role: 'cashier', status: 'active', initials: 'BK', storeId: 's1', password: 'password123' },
+  { id: 'st3', name: 'Clara Wanjiku', email: 'clara@nexa.co', role: 'manager', status: 'active', initials: 'CW', storeId: 's1', password: 'password123' },
+  { id: 'st4', name: 'David Otieno', email: 'david@nexa.co', role: 'cashier', status: 'inactive', initials: 'DO', storeId: 's2', password: 'password123' },
 ];
 
 export const recentTransactions: Transaction[] = [
