@@ -102,3 +102,17 @@ export const topProducts = [
   { name: 'Wireless Earbuds Pro', sold: 87, revenue: 304500 },
   { name: 'USB-C Fast Charger', sold: 134, revenue: 160800 },
 ];
+
+export const profitAndLoss = [
+  { month: 'Jan', revenue: 420000, expenses: 280000, profit: 140000 },
+  { month: 'Feb', revenue: 380000, expenses: 260000, profit: 120000 },
+  { month: 'Mar', revenue: 528000, expenses: 310000, profit: 218000 },
+];
+
+export const storeActivities = [
+  { id: 'a1', store: 'Downtown Flagship', action: 'New staff added', user: 'Clara Wanjiku', time: '2 hours ago', type: 'staff' },
+  { id: 'a2', store: 'Westlands Branch', action: 'Low stock alert: USB-C Fast Charger', user: 'System', time: '4 hours ago', type: 'inventory' },
+  { id: 'a3', store: 'Mombasa Outlet', action: 'Store status changed to Inactive', user: 'Admin', time: 'Yesterday', type: 'system' },
+  { id: 'a4', store: 'Downtown Flagship', action: 'Price update: Wireless Earbuds Pro', user: 'Clara Wanjiku', time: 'Yesterday', type: 'inventory' },
+  { id: 'a5', store: 'Global', action: 'New store "Vintage Vault" registered', user: 'System', time: '2 days ago', type: 'registration' },
+];

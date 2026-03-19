@@ -1,8 +1,8 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
-import { stores, dailyRevenue, paymentBreakdown, recentTransactions, topProducts } from '@/data/demo';
-import { TrendingUp, DollarSign, ShoppingBag, Store, ArrowUpRight, ArrowDownRight, Download } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
+import { TrendingUp, DollarSign, ShoppingBag, Store, ArrowUpRight, ArrowDownRight, Download, Users, Package, Bell, ClipboardList } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, Legend } from 'recharts';
+import { stores, dailyRevenue, paymentBreakdown, recentTransactions, topProducts, profitAndLoss, storeActivities } from '@/data/demo';
 
 function StatCard({ label, value, change, positive, icon: Icon, delay }: {
   label: string; value: string; change: string; positive: boolean;
@@ -24,6 +24,61 @@ function StatCard({ label, value, change, positive, icon: Icon, delay }: {
     </div>
   );
 }
+function ActivityItem({ activity }: { activity: typeof storeActivities[0] }) {
+  const icons = {
+    staff: Users,
+    inventory: Package,
+    system: Bell,
+    registration: ClipboardList,
+  };
+  const Icon = icons[activity.type as keyof typeof icons] || Bell;
+  
+  return (
+    <div className="flex items-start gap-4 py-3 border-b border-border last:border-0">
+      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
+        <Icon className="w-4 h-4 text-muted-foreground" />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="flex justify-between items-start">
+          <p className="text-sm font-medium truncate">{activity.action}</p>
+          <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-2">{activity.time}</span>
+        </div>
+        <p className="text-[11px] text-muted-foreground">
+          {activity.store} • {activity.user}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+function PnLChart() {
+  return (
+    <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-7 h-full">
+      <div className="flex justify-between items-center mb-6">
+        <p className="text-sm font-medium">Profit & Loss Analysis</p>
+        <div className="flex gap-4 text-[10px] uppercase tracking-wider font-semibold">
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-primary"></div> Revenue</div>
+          <div className="flex items-center gap-1.5"><div className="w-2 h-2 rounded-full bg-destructive"></div> Expenses</div>
+        </div>
+      </div>
+      <div className="h-64">
+        <ResponsiveContainer width="100%" height="100%">
+          <LineChart data={profitAndLoss}>
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(220 10% 90%)" />
+            <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'hsl(220 8% 50%)' }} />
+            <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'hsl(220 8% 50%)' }} tickFormatter={v => `₦${(v/1000)}k`} />
+            <Tooltip
+              contentStyle={{ background: 'hsl(0 0% 100%)', border: '1px solid hsl(40 10% 90%)', borderRadius: 8, fontSize: 12 }}
+              formatter={(value: number) => [`₦${value.toLocaleString()}`]}
+            />
+            <Line type="monotone" dataKey="revenue" stroke="hsl(220 12% 14%)" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+            <Line type="monotone" dataKey="expenses" stroke="hsl(0 72% 51%)" strokeWidth={2} dot={{ r: 4 }} activeDot={{ r: 6 }} />
+          </LineChart>
+        </ResponsiveContainer>
+      </div>
+    </div>
+  );
+}
 
 function AdminDashboardContent() {
   const totalRevenue = stores.reduce((s, st) => s + st.revenue, 0);
@@ -37,45 +92,21 @@ function AdminDashboardContent() {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-        <StatCard label="Total Revenue" value={`₦${totalRevenue.toLocaleString()}`} change="12.4%" positive icon={DollarSign} delay={1} />
+        <StatCard label="Total Sales" value={`₦${totalRevenue.toLocaleString()}`} change="12.4%" positive icon={DollarSign} delay={1} />
         <StatCard label="Transactions" value={totalTransactions.toLocaleString()} change="8.2%" positive icon={ShoppingBag} delay={2} />
         <StatCard label="Active Stores" value={stores.filter(s => s.status === 'active').length.toString()} change="0%" positive icon={Store} delay={3} />
-        <StatCard label="Growth Rate" value="14.7%" change="2.1%" positive icon={TrendingUp} delay={4} />
+        <StatCard label="Net Profit" value={`₦${(profitAndLoss[2].profit).toLocaleString()}`} change="14.7%" positive icon={TrendingUp} delay={4} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-3 mt-3">
-        <div className="lg:col-span-3 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-5">
-          <p className="text-sm font-medium mb-4">Weekly Revenue</p>
-          <div className="h-48">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={dailyRevenue}>
-                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: 'hsl(220 8% 50%)' }} />
-                <YAxis hide />
-                <Tooltip
-                  contentStyle={{ background: 'hsl(0 0% 100%)', border: '1px solid hsl(40 10% 90%)', borderRadius: 8, fontSize: 12 }}
-                  cursor={{ fill: 'hsl(40 10% 95%)' }}
-                  formatter={(value: number) => [`₦${value.toLocaleString()}`, 'Revenue']}
-                />
-                <Bar dataKey="revenue" fill="hsl(220 12% 14%)" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="lg:col-span-3">
+          <PnLChart />
         </div>
-
-        <div className="lg:col-span-2 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-6">
-          <p className="text-sm font-medium mb-4">Stores</p>
-          <div className="space-y-3">
-            {stores.map(store => (
-              <div key={store.id} className="flex items-center justify-between py-2">
-                <div className="flex items-center gap-3">
-                  <div className={`w-2 h-2 rounded-full ${store.status === 'active' ? 'bg-success' : 'bg-muted-foreground/30'}`} />
-                  <div>
-                    <p className="text-sm font-normal">{store.name}</p>
-                    <p className="text-[11px] text-muted-foreground">{store.location}</p>
-                  </div>
-                </div>
-                <p className="text-sm tabular-nums">₦{store.revenue.toLocaleString()}</p>
-              </div>
+        <div className="lg:col-span-2 bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-8">
+          <p className="text-sm font-medium mb-4">Multi-Store Activities</p>
+          <div className="space-y-1">
+            {storeActivities.map(activity => (
+              <ActivityItem key={activity.id} activity={activity} />
             ))}
           </div>
         </div>
