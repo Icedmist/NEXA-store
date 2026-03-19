@@ -148,11 +148,11 @@ export default function LandingPage() {
                     <a href="#features" className="flex justify-start items-center">
                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] dark:text-gray-400 text-xs md:text-[13px] font-medium leading-[14px] font-sans cursor-pointer hover:text-[#37322F] dark:hover:text-white transition-colors">Features</div>
                     </a>
+                    <a href="#stats" className="flex justify-start items-center">
+                      <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] dark:text-gray-400 text-xs md:text-[13px] font-medium leading-[14px] font-sans cursor-pointer hover:text-[#37322F] dark:hover:text-white transition-colors">Impact</div>
+                    </a>
                     <a href="#pricing" className="flex justify-start items-center">
                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] dark:text-gray-400 text-xs md:text-[13px] font-medium leading-[14px] font-sans cursor-pointer hover:text-[#37322F] dark:hover:text-white transition-colors">Pricing</div>
-                    </a>
-                    <a href="#docs" className="flex justify-start items-center">
-                      <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] dark:text-gray-400 text-xs md:text-[13px] font-medium leading-[14px] font-sans cursor-pointer hover:text-[#37322F] dark:hover:text-white transition-colors">Docs</div>
                     </a>
                     <a href="#faq" className="flex justify-start items-center">
                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] dark:text-gray-400 text-xs md:text-[13px] font-medium leading-[14px] font-sans cursor-pointer hover:text-[#37322F] dark:hover:text-white transition-colors">FAQ</div>
@@ -196,7 +196,7 @@ export default function LandingPage() {
               <div className="w-full max-w-[500px] flex flex-col justify-center items-center gap-8 relative z-10 mt-10 animate-fade-in stagger-2">
                 <div className="flex justify-start items-center gap-4">
                   <div
-                    onClick={() => navigate("/login")}
+                    onClick={() => navigate("/register")}
                     className="h-12 sm:h-14 px-10 sm:px-14 py-3 bg-primary text-primary-foreground shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(255,255,255,0.05)] rounded-full flex justify-center items-center cursor-pointer hover:scale-105 transition-all duration-500 active:scale-95 group relative overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
@@ -342,7 +342,7 @@ export default function LandingPage() {
             </div>
 
             {/* Social Proof */}
-            <div className="w-full border-b border-[rgba(55,50,47,0.12)] dark:border-white/5 flex flex-col justify-center items-center">
+            <div id="stats" className="w-full border-b border-[rgba(55,50,47,0.12)] dark:border-white/5 flex flex-col justify-center items-center scroll-mt-20">
               <div className="w-full max-w-7xl px-4 sm:px-6 md:px-8 py-8 sm:py-12 md:py-16 flex justify-center items-center gap-6">
                 <div className="w-full max-w-[586px] px-4 sm:px-6 py-4 sm:py-5 overflow-hidden rounded-lg flex flex-col justify-start items-center gap-3 sm:gap-4">
                   <Badge
@@ -479,11 +479,6 @@ export default function LandingPage() {
             <div className="w-full flex justify-center bg-transparent">
               <div className="w-full max-w-7xl">
                 <CTASection />
-              </div>
-            </div>
-            <div className="w-full flex justify-center bg-transparent">
-              <div className="w-full max-w-7xl">
-                <StoreRegistrationSection />
               </div>
             </div>
             <div className="w-full flex justify-center bg-transparent">
