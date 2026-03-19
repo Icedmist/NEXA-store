@@ -1,14 +1,20 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Role, CartItem, Product } from '@/data/demo';
+import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
+import { stores as initialStores, staff as initialStaff, Store, StaffMember, Role, CartItem, Product } from '@/data/demo';
 
-interface AppState {
+interface AppContextType {
   role: Role | null;
-  storeName: string;
-  cart: CartItem[];
-}
-
-interface AppContextType extends AppState {
   setRole: (role: Role | null) => void;
+  storeName: string | null;
+  stores: Store[];
+  staff: StaffMember[];
+  notifications: any[];
+  setStoreName: (name: string | null) => void;
+  registerStore: (name: string, email: string) => Promise<void>;
+  addStore: (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => void;
+  updateStore: (id: string, updates: Partial<Store>) => void;
+  addStaff: (member: Omit<StaffMember, 'id' | 'initials'>) => void;
+  updateStaff: (id: string, updates: Partial<StaffMember>) => void;
+  logActivity: (action: string, user: string, storeId?: string) => void;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateCartQty: (productId: string, qty: number) => void;
@@ -16,32 +22,36 @@ interface AppContextType extends AppState {
   cartTotal: number;
   cartCount: number;
   logout: () => void;
-  registerStore: (name: string, email: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | null>(null);
 
-export function AppProvider({ children }: { children: React.ReactNode }) {
+export function AppProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role | null>(() => {
-    // Load role from localStorage on initial load
     const saved = localStorage.getItem('nexa-role');
-    return saved ? JSON.parse(saved) : null;
+    return saved ? (JSON.parse(saved) as Role) : 'admin';
   });
-  const [storeName, setStoreName] = useState('Downtown Flagship');
+  const [storeName, setStoreName] = useState<string | null>('Downtown Flagship');
+  const [stores, setStores] = useState<Store[]>(initialStores);
+  const [staff, setStaff] = useState<StaffMember[]>(initialStaff);
+  const [notifications, setNotifications] = useState<any[]>([]);
+
   const [cart, setCart] = useState<CartItem[]>(() => {
-    // Load cart from localStorage on initial load
     const saved = localStorage.getItem('nexa-cart');
     return saved ? JSON.parse(saved) : [];
   });
 
-  const setRoleWithStorage = useCallback((role: Role | null) => {
-    setRole(role);
+  useEffect(() => {
     if (role) {
       localStorage.setItem('nexa-role', JSON.stringify(role));
     } else {
       localStorage.removeItem('nexa-role');
     }
-  }, []);
+  }, [role]);
+
+  useEffect(() => {
+    localStorage.setItem('nexa-cart', JSON.stringify(cart));
+  }, [cart]);
 
   const addToCart = useCallback((product: Product) => {
     setCart(prev => {
@@ -74,22 +84,72 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
   const cartCount = cart.reduce((sum, i) => sum + i.qty, 0);
 
   const logout = useCallback(() => {
-    setRoleWithStorage(null);
+    setRole(null);
     clearCart();
-  }, [setRoleWithStorage, clearCart]);
+  }, [clearCart]);
 
-  const registerStore = useCallback(async (name: string, email: string) => {
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 800));
-    setStoreName(name);
-    setRoleWithStorage('admin');
-  }, [setStoreName, setRoleWithStorage]);
+  const registerStore = async (name: string, email: string) => {
+    return new Promise<void>((resolve) => {
+      setTimeout(() => {
+        setStoreName(name);
+        setRole('admin');
+        resolve();
+      }, 1500);
+    });
+  };
+
+  const addStore = (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => {
+    const newStore: Store = {
+      ...store,
+      id: `s${Date.now()}`,
+      code: `NX-${Math.floor(1000 + Math.random() * 9000)}`,
+      status: 'active',
+      revenue: 0,
+      transactions: 0,
+    };
+    setStores(prev => [newStore, ...prev]);
+    logActivity(`New store "${store.name}" created`, 'Admin');
+  };
+
+  const updateStore = (id: string, updates: Partial<Store>) => {
+    setStores(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+    logActivity(`Store "${id}" updated`, 'Admin');
+  };
+
+  const addStaff = (member: Omit<StaffMember, 'id' | 'initials'>) => {
+    const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+    const newMember: StaffMember = {
+      ...member,
+      id: `st${Date.now()}`,
+      initials,
+    };
+    setStaff(prev => [newMember, ...prev]);
+    logActivity(`Staff member "${member.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
+  };
+
+  const updateStaff = (id: string, updates: Partial<StaffMember>) => {
+    const member = staff.find(s => s.id === id);
+    setStaff(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
+    logActivity(`Staff member "${member?.name}" updated`, role === 'admin' ? 'Admin' : 'Manager', member?.storeId);
+  };
+
+  const logActivity = (action: string, user: string, storeId?: string) => {
+    const store = stores.find(s => s.id === storeId);
+    const activity = {
+      id: `notif-${Date.now()}`,
+      action,
+      user,
+      store: store?.name || 'Global',
+      time: 'Just now',
+    };
+    setNotifications(prev => [activity, ...prev]);
+  };
 
   return (
     <AppContext.Provider value={{
-      role, setRole: setRoleWithStorage, storeName, cart,
-      addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout,
-      registerStore
+      role, setRole, storeName, setStoreName, registerStore,
+      stores, staff, notifications, addStore, updateStore, addStaff, updateStaff, logActivity,
+      addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout
     }}>
       {children}
     </AppContext.Provider>
