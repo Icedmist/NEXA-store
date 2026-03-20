@@ -1,8 +1,9 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useState, useCallback } from 'react';
-import { products as allProducts, categories, Product } from '@/data/demo';
-import { Search, Plus, AlertTriangle, Package, X, Upload, FileSpreadsheet, Check, Printer } from 'lucide-react';
+import { Search, Plus, AlertTriangle, Package, X, Upload, FileSpreadsheet, Check, Printer, Edit2, Download, Trash2 } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
+import { useApp } from '@/context/AppContext';
+import { categories, Product } from '@/data/demo';
 
 interface CSVRow {
   name: string;
@@ -12,10 +13,11 @@ interface CSVRow {
 }
 
 export default function Inventory() {
-  const [products, setProducts] = useState<Product[]>(allProducts);
+  const { products, addProduct, updateProduct, deleteProduct, role } = useApp();
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [showAdd, setShowAdd] = useState(false);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showBulk, setShowBulk] = useState(false);
   const [newProduct, setNewProduct] = useState({ name: '', category: categories[0], price: '', stock: '' });
   const [dragOver, setDragOver] = useState(false);
@@ -36,19 +38,43 @@ export default function Inventory() {
 
   const handleAddProduct = () => {
     if (!newProduct.name || !newProduct.price || !newProduct.stock) return;
-    const product: Product = {
-      id: `p${Date.now()}`,
-      name: newProduct.name,
-      category: newProduct.category,
-      price: Number(newProduct.price),
-      stock: Number(newProduct.stock),
-      lowStockThreshold: 10,
-      qrCode: `QR-${Date.now()}`,
-      image: '📦',
-    };
-    setProducts(prev => [product, ...prev]);
+    if (editingProduct) {
+      updateProduct(editingProduct.id, {
+        name: newProduct.name,
+        category: newProduct.category,
+        price: Number(newProduct.price),
+        stock: Number(newProduct.stock)
+      });
+    } else {
+      addProduct({
+        name: newProduct.name,
+        category: newProduct.category,
+        price: Number(newProduct.price),
+        stock: Number(newProduct.stock)
+      });
+    }
     setNewProduct({ name: '', category: categories[0], price: '', stock: '' });
     setShowAdd(false);
+    setEditingProduct(null);
+  };
+
+  const startEdit = (p: Product) => {
+    setNewProduct({ name: p.name, category: p.category, price: p.price.toString(), stock: p.stock.toString() });
+    setEditingProduct(p);
+    setShowAdd(true);
+  };
+
+  const handleExportProducts = () => {
+    const csvContent = [
+      'ID,Name,Category,Price,Stock,QR Code',
+      ...filtered.map(p => `${p.id},"${p.name}","${p.category}",${p.price},${p.stock},${p.qrCode}`)
+    ].join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `inventory-export-${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
   };
 
   const parseCSV = useCallback((text: string) => {
@@ -93,17 +119,13 @@ export default function Inventory() {
   }, [handleFile]);
 
   const handleBulkImport = () => {
-    const newProducts: Product[] = csvData.map((row, i) => ({
-      id: `p${Date.now()}-${i}`,
+    const newProducts = csvData.map((row, i) => ({
       name: row.name,
       category: row.category,
       price: Number(row.price) || 0,
       stock: Number(row.stock) || 0,
-      lowStockThreshold: 10,
-      qrCode: `QR-${Date.now()}-${i}`,
-      image: '📦',
     }));
-    setProducts(prev => [...newProducts, ...prev]);
+    newProducts.forEach(p => addProduct(p));
     setBulkImported(true);
     setTimeout(() => {
       setBulkImported(false);
@@ -146,24 +168,34 @@ export default function Inventory() {
               )}
             </p>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={handleExportProducts}
+              title="Export CSV"
+              className="flex items-center justify-center gap-2 bg-card border border-border px-3 sm:px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors flex-1 sm:flex-none"
+            >
+              <Download className="w-4 h-4" />
+              <span className="hidden md:inline">Export</span>
+            </button>
             <button
               onClick={() => setShowLabels(true)}
-              className="flex items-center gap-2 bg-card border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors"
+              title="QR Labels"
+              className="flex items-center justify-center gap-2 bg-card border border-border px-3 sm:px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors flex-1 sm:flex-none"
             >
               <Printer className="w-4 h-4" />
-              <span className="hidden sm:inline">QR Labels</span>
+              <span className="hidden md:inline">Labels</span>
             </button>
             <button
               onClick={() => setShowBulk(true)}
-              className="flex items-center gap-2 bg-card border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors"
+              title="CSV Upload"
+              className="flex items-center justify-center gap-2 bg-card border border-border px-3 sm:px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors flex-1 sm:flex-none"
             >
               <Upload className="w-4 h-4" />
-              <span className="hidden sm:inline">CSV Upload</span>
+              <span className="hidden md:inline">Upload</span>
             </button>
             <button
               onClick={() => setShowAdd(true)}
-              className="flex items-center gap-2 bg-primary text-primary-foreground px-4 h-10 rounded-xl text-sm font-medium hover:shadow-md transition-shadow"
+              className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-4 h-10 rounded-xl text-sm font-medium hover:shadow-md transition-shadow flex-1 sm:flex-none whitespace-nowrap"
             >
               <Plus className="w-4 h-4" />
               Add Product
@@ -223,10 +255,20 @@ export default function Inventory() {
                 <p className="text-sm font-medium leading-tight">{product.name}</p>
                 <p className="text-[11px] text-muted-foreground mt-0.5">{product.category}</p>
                 <div className="flex items-end justify-between mt-3">
-                  <p className="text-lg font-medium tabular-nums tracking-tight">₦{product.price.toLocaleString()}</p>
-                  <p className={`text-xs tabular-nums ${isLow ? 'text-destructive' : 'text-muted-foreground'}`}>
-                    {product.stock} in stock
-                  </p>
+                  <div>
+                    <p className="text-lg font-medium tabular-nums tracking-tight">₦{product.price.toLocaleString()}</p>
+                    <p className={`text-[10px] tabular-nums ${isLow ? 'text-destructive' : 'text-muted-foreground'}`}>
+                      {product.stock} in stock
+                    </p>
+                  </div>
+                  <div className="flex gap-1">
+                    <button onClick={() => startEdit(product)} className="w-8 h-8 rounded-lg bg-muted text-muted-foreground hover:bg-muted/80 flex items-center justify-center transition-colors">
+                      <Edit2 className="w-3.5 h-3.5" />
+                    </button>
+                    <button onClick={() => deleteProduct(product.id)} className="w-8 h-8 rounded-lg bg-muted text-muted-foreground hover:bg-destructive/10 hover:text-destructive flex items-center justify-center transition-colors">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
                 </div>
               </div>
             );
@@ -242,11 +284,11 @@ export default function Inventory() {
 
         {/* Add product modal */}
         {showAdd && (
-          <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
+          <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => { setShowAdd(false); setEditingProduct(null); }}>
             <div className="bg-card rounded-2xl border border-border p-6 w-full max-w-md animate-scale-in" onClick={e => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-medium">Add Product</h2>
-                <button onClick={() => setShowAdd(false)} className="p-1 rounded-md hover:bg-muted">
+                <h2 className="text-base font-medium">{editingProduct ? 'Edit Product' : 'Add Product'}</h2>
+                <button onClick={() => { setShowAdd(false); setEditingProduct(null); }} className="p-1 rounded-md hover:bg-muted">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -269,7 +311,7 @@ export default function Inventory() {
                 </div>
                 <button onClick={handleAddProduct}
                   className="w-full h-10 bg-primary text-primary-foreground rounded-xl text-sm font-medium">
-                  Add Product
+                  {editingProduct ? 'Update Product' : 'Add Product'}
                 </button>
               </div>
             </div>

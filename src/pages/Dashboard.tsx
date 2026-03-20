@@ -87,9 +87,27 @@ function AdminDashboardContent() {
 
   return (
     <div>
-      <div className="mb-8 animate-fade-in">
-        <h1 className="text-xl font-medium tracking-tight">Dashboard</h1>
-        <p className="text-sm text-muted-foreground font-light mt-1">Overview across all stores</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 animate-fade-in">
+        <div className="flex-1">
+          <h1 className="text-xl font-medium tracking-tight">Dashboard</h1>
+          <p className="text-sm text-muted-foreground font-light mt-1">Overview across all stores</p>
+        </div>
+        <button onClick={() => {
+          const csvLines = [
+            'Month,Revenue,Expenses,Profit',
+            ...profitAndLoss.map(d => `${d.month},${d.revenue},${d.expenses},${d.profit}`)
+          ].join('\n');
+          const blob = new Blob([csvLines], { type: 'text/csv' });
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'pnl-report.csv';
+          a.click();
+        }}
+          className="flex items-center justify-center gap-2 bg-card/60 backdrop-blur-md border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors w-full sm:w-auto">
+          <Download className="w-4 h-4" />
+          Export P&L
+        </button>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
@@ -133,7 +151,23 @@ function AdminDashboardContent() {
       </div>
 
       <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 mt-3 animate-fade-in">
-        <p className="text-sm font-medium mb-4">Recent Transactions</p>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm font-medium">Recent Transactions</p>
+          <button onClick={() => {
+            const csv = [
+              'ID,Items Count,Total,Payment,Cashier',
+              ...recentTransactions.map(tx => `${tx.id},${tx.items.length},${tx.total},${tx.paymentMethod},${tx.cashier}`)
+            ].join('\n');
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'transactions-history.csv';
+            a.click();
+          }} className="text-xs text-primary hover:underline flex items-center gap-1">
+            <Download className="w-3 h-3" /> Download History
+          </button>
+        </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
@@ -270,7 +304,23 @@ function ManagerDashboardContent() {
 
         {/* Recent Transactions */}
         <div className="bg-card/60 backdrop-blur-md rounded-xl border border-border p-5 animate-fade-in stagger-8">
-          <p className="text-sm font-medium mb-4">Recent Transactions</p>
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-sm font-medium">Recent Transactions</p>
+            <button onClick={() => {
+              const csv = [
+                'ID,Items Count,Total,Payment',
+                ...recentTransactions.map(tx => `${tx.id},${tx.items.length},${tx.total},${tx.paymentMethod}`)
+              ].join('\n');
+              const blob = new Blob([csv], { type: 'text/csv' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = 'store-transactions.csv';
+              a.click();
+            }} className="text-xs text-primary hover:underline flex items-center gap-1">
+              <Download className="w-3 h-3" /> Download CSV
+            </button>
+          </div>
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>

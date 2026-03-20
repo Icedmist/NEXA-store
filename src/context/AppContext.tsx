@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
-import { stores as initialStores, staff as initialStaff, Store, StaffMember, Role, CartItem, Product } from '@/data/demo';
+import { stores as initialStores, staff as initialStaff, products as initialProducts, Store, StaffMember, Role, CartItem, Product } from '@/data/demo';
 
 interface AppContextType {
   role: Role | null;
@@ -12,6 +12,10 @@ interface AppContextType {
   registerStore: (name: string, email: string) => Promise<void>;
   addStore: (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => void;
   updateStore: (id: string, updates: Partial<Store>) => void;
+  products: Product[];
+  addProduct: (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => void;
+  updateProduct: (id: string, updates: Partial<Product>) => void;
+  deleteProduct: (id: string) => void;
   addStaff: (member: Omit<StaffMember, 'id' | 'initials'>) => void;
   updateStaff: (id: string, updates: Partial<StaffMember>) => void;
   logActivity: (action: string, user: string, storeId?: string) => void;
@@ -34,6 +38,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [storeName, setStoreName] = useState<string | null>('Downtown Flagship');
   const [stores, setStores] = useState<Store[]>(initialStores);
   const [staff, setStaff] = useState<StaffMember[]>(initialStaff);
+  const [products, setProducts] = useState<Product[]>(initialProducts);
   const [notifications, setNotifications] = useState<any[]>([]);
 
   const [cart, setCart] = useState<CartItem[]>(() => {
@@ -116,6 +121,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setStores(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     logActivity(`Store "${store?.name}" updated`, 'Admin', id);
   };
+  
+  const addProduct = (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => {
+    const newProduct: Product = {
+      ...product,
+      id: `p${Date.now()}`,
+      qrCode: `QR-${Date.now()}`,
+      image: '📦',
+      lowStockThreshold: 10
+    };
+    setProducts(prev => [newProduct, ...prev]);
+    logActivity(`Product "${product.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
+  };
+
+  const updateProduct = (id: string, updates: Partial<Product>) => {
+    setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
+    const product = products.find(p => p.id === id);
+    logActivity(`Product "${product?.name}" updated`, role === 'admin' ? 'Admin' : 'Manager');
+  };
+
+  const deleteProduct = (id: string) => {
+    const product = products.find(p => p.id === id);
+    setProducts(prev => prev.filter(p => p.id !== id));
+    logActivity(`Product "${product?.name}" deleted`, role === 'admin' ? 'Admin' : 'Manager');
+  };
 
   const addStaff = (member: Omit<StaffMember, 'id' | 'initials'>) => {
     const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -149,7 +178,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       role, setRole, storeName, setStoreName, registerStore,
-      stores, staff, notifications, addStore, updateStore, addStaff, updateStaff, logActivity,
+      stores, staff, products, notifications, addStore, updateStore, addStaff, updateStaff, 
+      addProduct, updateProduct, deleteProduct, logActivity,
       addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout
     }}>
       {children}

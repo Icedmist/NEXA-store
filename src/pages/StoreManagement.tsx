@@ -67,17 +67,17 @@ export default function StoreManagement() {
     <DashboardLayout>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-8 animate-fade-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-6 animate-fade-in">
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/stores')} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors">
+            <button onClick={() => navigate('/stores')} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors flex-shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </button>
-            <div>
-              <h1 className="text-2xl font-medium tracking-tight">Manage {currentStore.name}</h1>
-              <p className="text-sm text-muted-foreground font-light mt-1">Configure parameters and personnel for this location</p>
+            <div className="min-w-0">
+              <h1 className="text-2xl font-medium tracking-tight truncate">Manage {currentStore.name}</h1>
+              <p className="text-sm text-muted-foreground font-light mt-1">Configure parameters and personnel</p>
             </div>
           </div>
-          <button onClick={handleSaveStore} className="flex items-center gap-2 bg-primary text-primary-foreground px-6 h-11 rounded-xl text-sm font-medium hover:shadow-lg transition-all active:scale-[0.98]">
+          <button onClick={handleSaveStore} className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 h-11 rounded-xl text-sm font-medium hover:shadow-lg transition-all active:scale-[0.98] w-full sm:w-auto">
             <Save className="w-4 h-4" />
             Save Changes
           </button>
