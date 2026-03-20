@@ -1,10 +1,11 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
-import { products as allProducts } from '@/data/demo';
+import { useApp } from '@/context/AppContext';
 import { useState } from 'react';
 import { Printer, Check } from 'lucide-react';
 import { QRCodeSVG } from 'qrcode.react';
 
 export default function Labels() {
+  const { products: allProducts } = useApp();
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [printed, setPrinted] = useState(false);
 

@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS stores (
   status TEXT CHECK (status IN ('active', 'inactive')) DEFAULT 'active',
   revenue NUMERIC DEFAULT 0,
   transactions INT DEFAULT 0,
-  manager_id TEXT
+  manager_id TEXT,
+  slug TEXT UNIQUE
 );
 
 -- Products
@@ -36,7 +37,7 @@ CREATE TABLE IF NOT EXISTS staff_members (
   status TEXT CHECK (status IN ('active', 'inactive')) DEFAULT 'active',
   initials TEXT,
   store_id TEXT REFERENCES stores(id) ON DELETE SET NULL,
-  password_hash TEXT
+  temp_password TEXT
 );
 
 -- Transactions

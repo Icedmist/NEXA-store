@@ -1,6 +1,6 @@
 import { useApp } from '@/context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ArrowRight, Loader2, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,12 +8,26 @@ import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabase';
 
 export default function Login() {
-  const { setRole } = useApp();
+  const { setRole, setStoreName } = useApp();
   const navigate = useNavigate();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [portalSlug, setPortalSlug] = useState<string | null>(null);
+
+  useEffect(() => {
+    const host = window.location.hostname;
+    const parts = host.split('.');
+    
+    // Simple mock logic for generic domains vs store subdomains
+    if (parts.length > 2 || (parts.length === 2 && host.includes('localhost') && parts[0] !== 'localhost')) {
+      const slug = parts[0];
+      if (slug !== 'www' && slug !== 'app') {
+        setPortalSlug(slug);
+      }
+    }
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,25 +38,86 @@ export default function Login() {
 
     try {
       // 1. Sign in with Supabase Auth
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
+      let { data, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
+      // Lazy Registration Logic
+      if (authError && authError.message.includes('Invalid login credentials')) {
+        // Check if there's a matching temp_password in staff_members
+        const { data: staffMatch } = await supabase
+          .from('staff_members')
+          .select('id, temp_password')
+          .eq('email', email)
+          .single();
+
+        if (staffMatch && staffMatch.temp_password === password) {
+          // Password verified against temp_password!
+          // Register them for real in Supabase Auth
+          const { data: signUpData, error: signUpErr } = await supabase.auth.signUp({
+            email,
+            password
+          });
+          
+          if (signUpErr) throw signUpErr;
+
+          // Clear temp_password so it can't be reused, update the user ID if needed 
+          // (though ID should probably stay the original generated ID, or we update the auth user. Better to just clear temp_password)
+          await supabase.from('staff_members').update({ temp_password: null, status: 'active' }).eq('id', staffMatch.id);
+
+          // We are now signed in via signUp!
+          authError = null;
+        }
+      }
+
+      // If still error, throw
       if (authError) throw authError;
 
-      // 2. Fetch role from staff_members table based on email
+      // 2. Fetch role and store_id from staff_members table based on email
       const { data: staff, error: staffErr } = await supabase
         .from('staff_members')
-        .select('role')
+        .select('role, store_id')
         .eq('email', email)
         .single();
 
-      if (staffErr) {
-        console.warn('Failed to fetch staff role from DB. Falling back to staff.', staffErr);
+      if (staffErr || !staff) {
+        throw new Error('Your account profile is missing or corrupted. If you created this account previously before the recent updates, please register a brand new store to set up your admin profile correctly.');
+      } 
+      
+      if (staff?.store_id) {
+        // Fetch the specific store name & slug, with fallback for outdated schema cache
+        let storeData = null;
+        const resStore = await supabase
+          .from('stores')
+          .select('name, slug')
+          .eq('id', staff.store_id)
+          .single();
+          
+        if (resStore.error) {
+          if (resStore.error.code === 'PGRST204' || resStore.error.message.includes('slug')) {
+             const fbStore = await supabase.from('stores').select('name').eq('id', staff.store_id).single();
+             storeData = fbStore.data;
+          } else {
+             throw resStore.error;
+          }
+        } else {
+          storeData = resStore.data;
+        }
+          
+        if (storeData?.name) {
+          setStoreName(storeData.name);
+        }
+        
+        // Strict mapping check for subdomain
+        // if storeData lacks slug due to old accounts, we just proceed.
+        if (portalSlug && storeData?.slug && storeData.slug !== portalSlug) {
+           await supabase.auth.signOut();
+           throw new Error(`Invalid Access: Your account does not belong to the ${portalSlug} store portal.`);
+        }
       }
 
-      const userRole = staff?.role || 'staff';
+      const userRole = staff.role;
       setRole(userRole as any);
 
       // 3. Navigate based on role
@@ -63,7 +138,7 @@ export default function Login() {
           <div className="w-24 h-24 mx-auto mb-5 transition-transform hover:scale-105 duration-300 drop-shadow-lg">
             <img src="/logo.png" alt="Nexa Logo" className="w-full h-full object-contain" />
           </div>
-          <h1 className="text-2xl font-medium tracking-tight">Nexa Store OS</h1>
+          <h1 className="text-2xl font-medium tracking-tight">{portalSlug ? `Login to ${portalSlug.toUpperCase()}` : 'Nexa Store OS'}</h1>
           <p className="text-sm text-muted-foreground mt-2 font-light">Sign in to your account to continue</p>
         </div>
 

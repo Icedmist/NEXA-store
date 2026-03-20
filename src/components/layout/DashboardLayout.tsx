@@ -10,7 +10,7 @@ import { ModeToggle } from '@/components/ModeToggle';
 const navItems = {
   admin: [
     { label: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
-    { label: 'Stores', path: '/stores', icon: Store },
+    { label: 'Branches', path: '/branches', icon: Store },
     { label: 'Settings', path: '/settings', icon: Settings },
   ],
   manager: [

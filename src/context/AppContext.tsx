@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
-import { stores as initialStores, staff as initialStaff, products as initialProducts, Store, StaffMember, Role, CartItem, Product } from '@/data/demo';
+import { stores as initialStores, staff as initialStaff, products as initialProducts, Store, StaffMember, Role, CartItem, Product, Transaction } from '@/data/demo';
 import { supabase } from '@/lib/supabase';
 
 interface AppContextType {
@@ -8,6 +8,7 @@ interface AppContextType {
   storeName: string | null;
   stores: Store[];
   staff: StaffMember[];
+  transactions: Transaction[];
   notifications: any[];
   setStoreName: (name: string | null) => void;
   registerStore: (name: string, email: string, password?: string) => Promise<void>;
@@ -23,7 +24,9 @@ interface AppContextType {
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateCartQty: (productId: string, qty: number) => void;
+  addTransaction: (paymentMethod: 'cash' | 'card' | 'mobile', cashier: string, storeId?: string) => Promise<void>;
   clearCart: () => void;
+  cart: CartItem[];
   cartTotal: number;
   cartCount: number;
   logout: () => void;
@@ -39,10 +42,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (parsed && !['admin', 'manager', 'staff'].includes(parsed)) parsed = null;
     return parsed as Role | null;
   });
-  const [storeName, setStoreName] = useState<string | null>('Downtown Flagship');
+  const [storeName, setStoreName] = useState<string | null>(() => {
+    const saved = localStorage.getItem('nexa-store-name');
+    return saved ? JSON.parse(saved) : 'Downtown Flagship';
+  });
   const [stores, setStores] = useState<Store[]>([]);
   const [staff, setStaff] = useState<StaffMember[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
 
   useEffect(() => {
@@ -59,6 +66,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
         if (dbStores) setStores(dbStores);
         if (dbProducts) setProducts(dbProducts);
         if (dbStaff) setStaff(dbStaff);
+
+        const { data: dbTxns } = await supabase.from('transactions').select('*');
+        if (dbTxns) {
+          setTransactions(dbTxns.map((t: any) => ({
+             ...t,
+             paymentMethod: t.payment_method,
+             timestamp: t.timestamp
+          })));
+        }
+
+        const { data: dbNotifs } = await supabase.from('activities').select('*').order('time', { ascending: false });
+        if (dbNotifs) {
+          setNotifications(dbNotifs.map((n: any) => ({
+            id: n.id,
+            action: n.action,
+            user: n.user_name,
+            store: n.store,
+            time: new Date(n.time).toLocaleString(),
+            type: n.type || 'system'
+          })));
+        }
 
       } catch (error) {
         console.warn('Failed to load from Supabase. Starting with empty dataset.', error);
@@ -82,6 +110,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('nexa-role');
     }
   }, [role]);
+
+  useEffect(() => {
+    if (storeName) {
+      localStorage.setItem('nexa-store-name', JSON.stringify(storeName));
+    }
+  }, [storeName]);
 
   useEffect(() => {
     localStorage.setItem('nexa-cart', JSON.stringify(cart));
@@ -129,10 +163,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
 
       // 1. Sign up with Supabase Auth
-      const { data: authData, error: authErr } = await supabase.auth.signUp({
+      let { data: authData, error: authErr } = await supabase.auth.signUp({
         email,
         password
       });
+
+      if (authErr && authErr.message.toLowerCase().includes('user already registered')) {
+        // Fallback to signIn if the user exists but hasn't mapped their store correctly 
+        // (usually happens during local dev testing after wiping the public tables)
+        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (signInErr) {
+          throw new Error('This email is already registered, but the password provided was incorrect. Try logging in or use a different email.');
+        }
+        authData = signInData as any;
+        authErr = null;
+      }
 
       if (authErr) throw authErr;
       const userId = authData.user?.id;
@@ -141,6 +189,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       // 2. Create a new Store
       const newStoreId = `s${Date.now()}`;
+      const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '');
       const newStore: Store = {
         id: newStoreId,
         name,
@@ -151,7 +200,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
         transactions: 0
       };
 
-      const { error: storeErr } = await supabase.from('stores').insert([newStore]);
+      let storeErr = null;
+      const storeRes = await supabase.from('stores').insert([{ ...newStore, slug }]);
+      
+      if (storeRes.error) {
+        if (storeRes.error.code === 'PGRST204' || storeRes.error.message.includes('slug')) {
+           console.warn('Backend schema outdated. Falling back to insert without slug.');
+           const fallbackRes = await supabase.from('stores').insert([newStore]);
+           storeErr = fallbackRes.error;
+        } else {
+           storeErr = storeRes.error;
+        }
+      }
       if (storeErr) throw storeErr;
 
       // 3. Create Staff profile for owner (admin)
@@ -166,15 +226,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
         storeId: newStoreId
       };
 
-      const { error: staffErr } = await supabase.from('staff_members').insert([{
+      let staffErr = null;
+      const staffRes = await supabase.from('staff_members').insert([{
         id: userId,
         name: newStaff.name,
         email,
         role: newStaff.role,
         status: newStaff.status,
         initials,
-        store_id: newStoreId
+        store_id: newStoreId,
+        temp_password: null // Admins don't need this
       }]);
+
+      if (staffRes.error) {
+        if (staffRes.error.code === 'PGRST204' || staffRes.error.message.includes('temp_password')) {
+           const fallbackRes2 = await supabase.from('staff_members').insert([{
+             id: userId,
+             name: newStaff.name,
+             email,
+             role: newStaff.role,
+             status: newStaff.status,
+             initials,
+             store_id: newStoreId
+           }]);
+           staffErr = fallbackRes2.error;
+        } else {
+           staffErr = staffRes.error;
+        }
+      }
 
       if (staffErr) throw staffErr;
 
@@ -274,8 +353,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     logActivity(`Staff member "${member.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
 
     try {
-      await supabase.from('staff_members').insert([newMember]);
-    } catch (e) {
+      await supabase.from('staff_members').insert([{
+        id: newMember.id,
+        name: newMember.name,
+        email: newMember.email,
+        role: newMember.role,
+        status: newMember.status,
+        initials: newMember.initials,
+        store_id: newMember.storeId,
+        temp_password: newMember.tempPassword
+      }]);
+    } catch (e: any) {
+      if (e?.code === 'PGRST204' || e?.message?.includes('temp_password')) {
+        alert('Supabase Cache Error! Your new manager/staff cannot be saved yet.\n\nTo fix this: Go to your Supabase Dashboard -> Table Editor -> "staff_members".\nClick "Add Column", name it "dummy", hit Save, and then delete it.\n\nThis forces Supabase to refresh its cache so your passwords can save!');
+      }
       console.error('Failed to sync addStaff to Supabase', e);
     }
   };
@@ -285,8 +376,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setStaff(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     logActivity(`Staff member "${member?.name}" updated`, role === 'admin' ? 'Admin' : 'Manager', member?.storeId);
 
+    const dbUpdates: any = { ...updates };
+    if (updates.tempPassword !== undefined) {
+      dbUpdates.temp_password = updates.tempPassword;
+      delete dbUpdates.tempPassword;
+    }
+    if (updates.storeId !== undefined) {
+      dbUpdates.store_id = updates.storeId;
+      delete dbUpdates.storeId;
+    }
+
     try {
-      await supabase.from('staff_members').update(updates).eq('id', id);
+      await supabase.from('staff_members').update(dbUpdates).eq('id', id);
     } catch (e) {
       console.error('Failed to sync updateStaff to Supabase', e);
     }
@@ -302,14 +403,52 @@ export function AppProvider({ children }: { children: ReactNode }) {
       time: 'Just now',
     };
     setNotifications(prev => [activity, ...prev]);
+
+    supabase.from('activities').insert([{
+      id: activity.id,
+      action: activity.action,
+      user_name: activity.user,
+      store: activity.store,
+      type: 'system'
+    }]).then(({ error }) => {
+      if (error) console.error(error);
+    });
+  };
+
+  const addTransaction = async (paymentMethod: 'cash' | 'card' | 'mobile', cashier: string, storeId?: string) => {
+    if (cart.length === 0) return;
+    const newTxnId = `t${Date.now()}`;
+    const newTxn: Transaction = {
+      id: newTxnId,
+      items: cart.map(c => ({ name: c.name, qty: c.qty, price: c.price })),
+      total: cartTotal,
+      paymentMethod,
+      timestamp: new Date().toISOString(),
+      cashier
+    };
+    setTransactions(prev => [newTxn, ...prev]);
+
+    try {
+      await supabase.from('transactions').insert([{
+        id: newTxn.id,
+        items: newTxn.items,
+        total: newTxn.total,
+        payment_method: newTxn.paymentMethod,
+        cashier: newTxn.cashier,
+        timestamp: newTxn.timestamp,
+        store_id: storeId || null
+      }]);
+    } catch (e) {
+      console.error('Failed to sync transaction to Supabase', e);
+    }
   };
 
   return (
     <AppContext.Provider value={{
       role, setRole, storeName, setStoreName, registerStore,
-      stores, staff, products, notifications, addStore, updateStore, addStaff, updateStaff, 
+      stores, staff, products, transactions, notifications, addStore, updateStore, addStaff, updateStaff, 
       addProduct, updateProduct, deleteProduct, logActivity,
-      addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout
+      cart, addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout, addTransaction
     }}>
       {children}
     </AppContext.Provider>

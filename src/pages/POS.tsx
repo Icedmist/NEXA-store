@@ -1,6 +1,5 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
-import { products as allProducts } from '@/data/demo';
 import { useState } from 'react';
 import { Minus, Plus, Trash2, CreditCard, Banknote, Smartphone, Check, ShoppingCart } from 'lucide-react';
 
@@ -8,7 +7,7 @@ type PaymentMethod = 'cash' | 'card' | 'mobile';
 
 export default function POS() {
   const appCtx = useApp();
-  const { cart = [], addToCart, removeFromCart, updateCartQty, clearCart, cartTotal = 0, cartCount = 0 } = appCtx || {};
+  const { cart, addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, products: allProducts, addTransaction } = appCtx;
   const [search, setSearch] = useState('');
   const [showCheckout, setShowCheckout] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
@@ -17,7 +16,8 @@ export default function POS() {
 
   const filtered = Array.isArray(allProducts) ? allProducts.filter(p => p?.name?.toLowerCase().includes(search.toLowerCase())) : [];
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
+    await addTransaction(paymentMethod, 'Cashier');
     setReceiptId(`RCP-${Date.now().toString().slice(-6)}`);
     setShowReceipt(true);
     setShowCheckout(false);
