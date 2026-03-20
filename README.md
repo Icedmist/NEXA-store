@@ -38,6 +38,30 @@ The management portal caters heavily to three different operation types:
 
 ---
 
+## 🔒 Multi-Tenant & Staff Provisioning Flow
+
+Nexa Retail Hub features a sophisticated, frictionless onboarding system tailored for multi-store retail deployment:
+
+1. **Company Initialization (Admin)**
+   - The primary Store Owner registers via the main access portal.
+   - The application dynamically creates a top-level Store Tenant (e.g. *Pardoom*) and provisions the Admin account automatically.
+   - The entire application instance adapts to this brand name contextually across the UI and logic barriers.
+
+2. **Branch Management**
+   - The Admin creates subsequent **Branches** (rather than independent disconnected stores) underneath the umbrella of the main tenancy. 
+
+3. **Secure Auto-Generation (Managers & Staff)**
+   - Creating new personnel is handled entirely within the *Personnel Directory*.
+   - Instead of requiring employees to use their personal emails and go through a vulnerable signup portal, Nexa auto-generates secure, branded credentials.
+   - Example: Adding a manager dynamically creates `mgr_123@pardoom.nexaos.com` alongside a highly-randomized 8-character temporary payload password.
+   - Only Admins and top-tier Managers can reset these access credentials directly. Agent endpoints remain strictly locked down from accessing sensitive settings.
+
+4. **Lazy Authentication & Resolution**
+   - To bypass traditional multi-step email validations in fast-paced retail environments, Nexa uses *Lazy Registration*. 
+   - When newly-created staff attempt to log in for the very first time using their given temporary credentials, the backend invisibly verifies against the encrypted staff ledger, provisions their live Auth Session in real-time, and locks in their token securely.
+
+---
+
 ## 💻 Tech Stack & Design
 
 - **Frontend Core:** React 18 + Vite (fast HMR)

@@ -1,13 +1,13 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
-import { products as allProducts } from '@/data/demo';
+import { Product } from '@/data/demo';
 import { useState, useEffect } from 'react';
 import { Camera, ScanLine } from 'lucide-react';
 
 export default function Scanner() {
-  const { addToCart } = useApp();
+  const { addToCart, products: allProducts } = useApp();
   const [scanning, setScanning] = useState(false);
-  const [found, setFound] = useState<typeof allProducts[0] | null>(null);
+  const [found, setFound] = useState<Product | null>(null);
   const [scanLine, setScanLine] = useState(0);
 
   useEffect(() => {

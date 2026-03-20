@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, ReactNode, useEffect } from 'react';
-import { stores as initialStores, staff as initialStaff, products as initialProducts, Store, StaffMember, Role, CartItem, Product } from '@/data/demo';
+import { stores as initialStores, staff as initialStaff, products as initialProducts, Store, StaffMember, Role, CartItem, Product, Transaction } from '@/data/demo';
+import { supabase } from '@/lib/supabase';
 
 interface AppContextType {
   role: Role | null;
@@ -7,22 +8,25 @@ interface AppContextType {
   storeName: string | null;
   stores: Store[];
   staff: StaffMember[];
+  transactions: Transaction[];
   notifications: any[];
   setStoreName: (name: string | null) => void;
-  registerStore: (name: string, email: string) => Promise<void>;
-  addStore: (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => void;
-  updateStore: (id: string, updates: Partial<Store>) => void;
+  registerStore: (name: string, email: string, password?: string) => Promise<void>;
+  addStore: (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => Promise<void>;
+  updateStore: (id: string, updates: Partial<Store>) => Promise<void>;
   products: Product[];
-  addProduct: (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => void;
-  updateProduct: (id: string, updates: Partial<Product>) => void;
-  deleteProduct: (id: string) => void;
-  addStaff: (member: Omit<StaffMember, 'id' | 'initials'>) => void;
-  updateStaff: (id: string, updates: Partial<StaffMember>) => void;
+  addProduct: (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => Promise<void>;
+  updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
+  deleteProduct: (id: string) => Promise<void>;
+  addStaff: (member: Omit<StaffMember, 'id' | 'initials'>) => Promise<void>;
+  updateStaff: (id: string, updates: Partial<StaffMember>) => Promise<void>;
   logActivity: (action: string, user: string, storeId?: string) => void;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateCartQty: (productId: string, qty: number) => void;
+  addTransaction: (paymentMethod: 'cash' | 'card' | 'mobile', cashier: string, storeId?: string) => Promise<void>;
   clearCart: () => void;
+  cart: CartItem[];
   cartTotal: number;
   cartCount: number;
   logout: () => void;
@@ -38,11 +42,61 @@ export function AppProvider({ children }: { children: ReactNode }) {
     if (parsed && !['admin', 'manager', 'staff'].includes(parsed)) parsed = null;
     return parsed as Role | null;
   });
-  const [storeName, setStoreName] = useState<string | null>('Downtown Flagship');
-  const [stores, setStores] = useState<Store[]>(initialStores);
-  const [staff, setStaff] = useState<StaffMember[]>(initialStaff);
-  const [products, setProducts] = useState<Product[]>(initialProducts);
+  const [storeName, setStoreName] = useState<string | null>(() => {
+    const saved = localStorage.getItem('nexa-store-name');
+    return saved ? JSON.parse(saved) : 'Downtown Flagship';
+  });
+  const [stores, setStores] = useState<Store[]>([]);
+  const [staff, setStaff] = useState<StaffMember[]>([]);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const { data: dbStores, error: storesErr } = await supabase.from('stores').select('*');
+        const { data: dbProducts, error: prodErr } = await supabase.from('products').select('*');
+        const { data: dbStaff, error: staffErr } = await supabase.from('staff_members').select('*');
+
+        if (storesErr || prodErr || staffErr) {
+          throw new Error('Supabase fetch failed');
+        }
+
+        if (dbStores) setStores(dbStores);
+        if (dbProducts) setProducts(dbProducts);
+        if (dbStaff) setStaff(dbStaff);
+
+        const { data: dbTxns } = await supabase.from('transactions').select('*');
+        if (dbTxns) {
+          setTransactions(dbTxns.map((t: any) => ({
+             ...t,
+             paymentMethod: t.payment_method,
+             timestamp: t.timestamp
+          })));
+        }
+
+        const { data: dbNotifs } = await supabase.from('activities').select('*').order('time', { ascending: false });
+        if (dbNotifs) {
+          setNotifications(dbNotifs.map((n: any) => ({
+            id: n.id,
+            action: n.action,
+            user: n.user_name,
+            store: n.store,
+            time: new Date(n.time).toLocaleString(),
+            type: n.type || 'system'
+          })));
+        }
+
+      } catch (error) {
+        console.warn('Failed to load from Supabase. Starting with empty dataset.', error);
+        setStores([]);
+        setProducts([]);
+        setStaff([]);
+      }
+    };
+    loadData();
+  }, []);
 
   const [cart, setCart] = useState<CartItem[]>(() => {
     const saved = localStorage.getItem('nexa-cart');
@@ -56,6 +110,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       localStorage.removeItem('nexa-role');
     }
   }, [role]);
+
+  useEffect(() => {
+    if (storeName) {
+      localStorage.setItem('nexa-store-name', JSON.stringify(storeName));
+    }
+  }, [storeName]);
 
   useEffect(() => {
     localStorage.setItem('nexa-cart', JSON.stringify(cart));
@@ -96,17 +156,120 @@ export function AppProvider({ children }: { children: ReactNode }) {
     clearCart();
   }, [clearCart]);
 
-  const registerStore = async (name: string, email: string) => {
-    return new Promise<void>((resolve) => {
-      setTimeout(() => {
-        setStoreName(name);
-        setRole('admin');
-        resolve();
-      }, 1500);
-    });
+  const registerStore = async (name: string, email: string, password?: string) => {
+    try {
+      if (!password) {
+        throw new Error('Password is required for registration.');
+      }
+
+      // 1. Sign up with Supabase Auth
+      let { data: authData, error: authErr } = await supabase.auth.signUp({
+        email,
+        password
+      });
+
+      if (authErr && authErr.message.toLowerCase().includes('user already registered')) {
+        // Fallback to signIn if the user exists but hasn't mapped their store correctly 
+        // (usually happens during local dev testing after wiping the public tables)
+        const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (signInErr) {
+          throw new Error('This email is already registered, but the password provided was incorrect. Try logging in or use a different email.');
+        }
+        authData = signInData as any;
+        authErr = null;
+      }
+
+      if (authErr) throw authErr;
+      const userId = authData.user?.id;
+
+      if (!userId) throw new Error("Could not retrieve user ID after signup.");
+
+      // 2. Create a new Store
+      const newStoreId = `s${Date.now()}`;
+      const slug = name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const newStore: Store = {
+        id: newStoreId,
+        name,
+        location: 'TBA',
+        code: `NX-${Math.floor(1000 + Math.random() * 9000)}`,
+        status: 'active',
+        revenue: 0,
+        transactions: 0
+      };
+
+      let storeErr = null;
+      const storeRes = await supabase.from('stores').insert([{ ...newStore, slug }]);
+      
+      if (storeRes.error) {
+        if (storeRes.error.code === 'PGRST204' || storeRes.error.message.includes('slug')) {
+           console.warn('Backend schema outdated. Falling back to insert without slug.');
+           const fallbackRes = await supabase.from('stores').insert([newStore]);
+           storeErr = fallbackRes.error;
+        } else {
+           storeErr = storeRes.error;
+        }
+      }
+      if (storeErr) throw storeErr;
+
+      // 3. Create Staff profile for owner (admin)
+      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      const newStaff: StaffMember = {
+        id: userId,
+        name: 'Admin',
+        email,
+        role: 'admin',
+        status: 'active',
+        initials,
+        storeId: newStoreId
+      };
+
+      let staffErr = null;
+      const staffRes = await supabase.from('staff_members').insert([{
+        id: userId,
+        name: newStaff.name,
+        email,
+        role: newStaff.role,
+        status: newStaff.status,
+        initials,
+        store_id: newStoreId,
+        temp_password: null // Admins don't need this
+      }]);
+
+      if (staffRes.error) {
+        if (staffRes.error.code === 'PGRST204' || staffRes.error.message.includes('temp_password')) {
+           const fallbackRes2 = await supabase.from('staff_members').insert([{
+             id: userId,
+             name: newStaff.name,
+             email,
+             role: newStaff.role,
+             status: newStaff.status,
+             initials,
+             store_id: newStoreId
+           }]);
+           staffErr = fallbackRes2.error;
+        } else {
+           staffErr = staffRes.error;
+        }
+      }
+
+      if (staffErr) throw staffErr;
+
+      // Update local states for responsive behavior
+      setStores(prev => [newStore, ...prev]);
+      setStaff(prev => [newStaff, ...prev]);
+      setStoreName(name);
+      setRole('admin');
+      
+    } catch (e) {
+      console.error('Failed to register store in Supabase', e);
+      throw e;
+    }
   };
 
-  const addStore = (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => {
+  const addStore = async (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => {
     const newStore: Store = {
       ...store,
       id: `s${Date.now()}`,
@@ -117,15 +280,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setStores(prev => [newStore, ...prev]);
     logActivity(`New store "${store.name}" created`, 'Admin');
+    
+    try {
+      await supabase.from('stores').insert([newStore]);
+    } catch (e) {
+      console.error('Failed to sync addStore to Supabase', e);
+    }
   };
 
-  const updateStore = (id: string, updates: Partial<Store>) => {
+  const updateStore = async (id: string, updates: Partial<Store>) => {
     const store = stores.find(s => s.id === id);
     setStores(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     logActivity(`Store "${store?.name}" updated`, 'Admin', id);
+
+    try {
+      await supabase.from('stores').update(updates).eq('id', id);
+    } catch (e) {
+      console.error('Failed to sync updateStore to Supabase', e);
+    }
   };
   
-  const addProduct = (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => {
+  const addProduct = async (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => {
     const newProduct: Product = {
       ...product,
       id: `p${Date.now()}`,
@@ -135,21 +310,39 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setProducts(prev => [newProduct, ...prev]);
     logActivity(`Product "${product.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
+
+    try {
+      await supabase.from('products').insert([newProduct]);
+    } catch (e) {
+      console.error('Failed to sync addProduct to Supabase', e);
+    }
   };
 
-  const updateProduct = (id: string, updates: Partial<Product>) => {
+  const updateProduct = async (id: string, updates: Partial<Product>) => {
     setProducts(prev => prev.map(p => p.id === id ? { ...p, ...updates } : p));
     const product = products.find(p => p.id === id);
     logActivity(`Product "${product?.name}" updated`, role === 'admin' ? 'Admin' : 'Manager');
+
+    try {
+      await supabase.from('products').update(updates).eq('id', id);
+    } catch (e) {
+      console.error('Failed to sync updateProduct to Supabase', e);
+    }
   };
 
-  const deleteProduct = (id: string) => {
+  const deleteProduct = async (id: string) => {
     const product = products.find(p => p.id === id);
     setProducts(prev => prev.filter(p => p.id !== id));
     logActivity(`Product "${product?.name}" deleted`, role === 'admin' ? 'Admin' : 'Manager');
+
+    try {
+      await supabase.from('products').delete().eq('id', id);
+    } catch (e) {
+      console.error('Failed to sync deleteProduct to Supabase', e);
+    }
   };
 
-  const addStaff = (member: Omit<StaffMember, 'id' | 'initials'>) => {
+  const addStaff = async (member: Omit<StaffMember, 'id' | 'initials'>) => {
     const initials = member.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
     const newMember: StaffMember = {
       ...member,
@@ -158,12 +351,46 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setStaff(prev => [newMember, ...prev]);
     logActivity(`Staff member "${member.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
+
+    try {
+      await supabase.from('staff_members').insert([{
+        id: newMember.id,
+        name: newMember.name,
+        email: newMember.email,
+        role: newMember.role,
+        status: newMember.status,
+        initials: newMember.initials,
+        store_id: newMember.storeId,
+        temp_password: newMember.tempPassword
+      }]);
+    } catch (e: any) {
+      if (e?.code === 'PGRST204' || e?.message?.includes('temp_password')) {
+        alert('Supabase Cache Error! Your new manager/staff cannot be saved yet.\n\nTo fix this: Go to your Supabase Dashboard -> Table Editor -> "staff_members".\nClick "Add Column", name it "dummy", hit Save, and then delete it.\n\nThis forces Supabase to refresh its cache so your passwords can save!');
+      }
+      console.error('Failed to sync addStaff to Supabase', e);
+    }
   };
 
-  const updateStaff = (id: string, updates: Partial<StaffMember>) => {
+  const updateStaff = async (id: string, updates: Partial<StaffMember>) => {
     const member = staff.find(s => s.id === id);
     setStaff(prev => prev.map(s => s.id === id ? { ...s, ...updates } : s));
     logActivity(`Staff member "${member?.name}" updated`, role === 'admin' ? 'Admin' : 'Manager', member?.storeId);
+
+    const dbUpdates: any = { ...updates };
+    if (updates.tempPassword !== undefined) {
+      dbUpdates.temp_password = updates.tempPassword;
+      delete dbUpdates.tempPassword;
+    }
+    if (updates.storeId !== undefined) {
+      dbUpdates.store_id = updates.storeId;
+      delete dbUpdates.storeId;
+    }
+
+    try {
+      await supabase.from('staff_members').update(dbUpdates).eq('id', id);
+    } catch (e) {
+      console.error('Failed to sync updateStaff to Supabase', e);
+    }
   };
 
   const logActivity = (action: string, user: string, storeId?: string) => {
@@ -176,14 +403,52 @@ export function AppProvider({ children }: { children: ReactNode }) {
       time: 'Just now',
     };
     setNotifications(prev => [activity, ...prev]);
+
+    supabase.from('activities').insert([{
+      id: activity.id,
+      action: activity.action,
+      user_name: activity.user,
+      store: activity.store,
+      type: 'system'
+    }]).then(({ error }) => {
+      if (error) console.error(error);
+    });
+  };
+
+  const addTransaction = async (paymentMethod: 'cash' | 'card' | 'mobile', cashier: string, storeId?: string) => {
+    if (cart.length === 0) return;
+    const newTxnId = `t${Date.now()}`;
+    const newTxn: Transaction = {
+      id: newTxnId,
+      items: cart.map(c => ({ name: c.name, qty: c.qty, price: c.price })),
+      total: cartTotal,
+      paymentMethod,
+      timestamp: new Date().toISOString(),
+      cashier
+    };
+    setTransactions(prev => [newTxn, ...prev]);
+
+    try {
+      await supabase.from('transactions').insert([{
+        id: newTxn.id,
+        items: newTxn.items,
+        total: newTxn.total,
+        payment_method: newTxn.paymentMethod,
+        cashier: newTxn.cashier,
+        timestamp: newTxn.timestamp,
+        store_id: storeId || null
+      }]);
+    } catch (e) {
+      console.error('Failed to sync transaction to Supabase', e);
+    }
   };
 
   return (
     <AppContext.Provider value={{
       role, setRole, storeName, setStoreName, registerStore,
-      stores, staff, products, notifications, addStore, updateStore, addStaff, updateStaff, 
+      stores, staff, products, transactions, notifications, addStore, updateStore, addStaff, updateStaff, 
       addProduct, updateProduct, deleteProduct, logActivity,
-      addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout
+      cart, addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout, addTransaction
     }}>
       {children}
     </AppContext.Provider>

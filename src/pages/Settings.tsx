@@ -1,13 +1,14 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
 import { useState } from 'react';
-import { Save, Check } from 'lucide-react';
+import { Camera, Check, Link, Save } from 'lucide-react';
+import { toast } from 'sonner';
 
 export default function SettingsPage() {
-  const { role } = useApp();
+  const { role, storeName, setStoreName } = useApp();
   const [saved, setSaved] = useState(false);
   const [settings, setSettings] = useState({
-    storeName: 'Downtown Flagship',
+    storeName: storeName || 'Nexa Store',
     email: 'admin@nexastore.co',
     smtpHost: 'smtp.gmail.com',
     smtpPort: '587',
@@ -17,7 +18,11 @@ export default function SettingsPage() {
     receiptHeader: 'Thank you for shopping with us!',
   });
 
-  const handleSave = () => { setSaved(true); setTimeout(() => setSaved(false), 2000); };
+  const handleSave = () => { 
+    setSaved(true); 
+    setStoreName(settings.storeName);
+    setTimeout(() => setSaved(false), 2000); 
+  };
   const update = (key: string, value: string | boolean) => setSettings(prev => ({ ...prev, [key]: value }));
 
   return (
@@ -57,6 +62,32 @@ export default function SettingsPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </section>
+
+          <section className="bg-primary/5 backdrop-blur-md rounded-xl border border-primary/20 p-5 mt-4 animate-fade-in stagger-2 relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-10 -mt-10 pointer-events-none" />
+            <h2 className="text-sm font-semibold text-primary mb-1">Store Login Portal</h2>
+            <p className="text-xs text-muted-foreground font-light mb-4">Share this exact URL with your managers and staff so they can securely log in to your branch.</p>
+            <div className="flex items-center justify-between bg-background border border-border p-3.5 rounded-xl shadow-inner">
+              <div className="min-w-0 flex-1">
+                <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Branded URL</p>
+                <div className="flex items-center gap-2 text-sm font-mono text-foreground truncate select-all">
+                  <span className="text-primary font-bold">http://</span>
+                  {settings.storeName.toLowerCase().replace(/[^a-z0-9]/g, '')}
+                  <span className="text-muted-foreground">.localhost:8080</span>
+                </div>
+              </div>
+              <button 
+                onClick={() => { 
+                  navigator.clipboard.writeText(`http://${settings.storeName.toLowerCase().replace(/[^a-z0-9]/g, '')}.localhost:8080`); 
+                  toast?.('Copied to clipboard'); 
+                }} 
+                className="ml-4 w-9 h-9 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors flex-shrink-0" title="Copy URL"
+              >
+                <Check className="w-4 h-4 opacity-0 absolute" />
+                <svg xmlns="http://www.000.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+              </button>
             </div>
           </section>
 

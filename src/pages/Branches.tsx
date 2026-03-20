@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Plus, Copy, Check, MapPin, X, Edit2, Users, Activity, TrendingUp, ShoppingBag, DollarSign, Calendar } from 'lucide-react';
 
-export default function Stores() {
+export default function Branches() {
   const navigate = useNavigate();
   const { stores: storeList, addStore, updateStore, staff, role, notifications } = useApp();
   const [showAdd, setShowAdd] = useState(false);
@@ -37,13 +37,13 @@ export default function Stores() {
       <div>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4 animate-fade-in">
           <div>
-            <h1 className="text-xl font-medium tracking-tight">Stores</h1>
-            <p className="text-sm text-muted-foreground font-light mt-1">Manage your store locations</p>
+            <h1 className="text-xl font-medium tracking-tight">Branches</h1>
+            <p className="text-sm text-muted-foreground font-light mt-1">Manage your branch locations</p>
           </div>
           <button onClick={() => setShowAdd(true)}
             className="flex items-center gap-2 bg-primary text-primary-foreground px-4 h-10 rounded-xl text-sm font-medium hover:shadow-md transition-shadow">
             <Plus className="w-4 h-4" />
-            New Store
+            New Branch
           </button>
         </div>
 
@@ -76,8 +76,8 @@ export default function Stores() {
                           {copied === store.code ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
                         </button>
                         {role === 'admin' && (
-                          <button onClick={() => navigate(`/stores/${store.id}/manage`)}
-                            className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted text-muted-foreground hover:bg-muted/80 transition-colors" title="Edit Store">
+                          <button onClick={() => navigate(`/branches/${store.id}/manage`)}
+                            className="flex items-center justify-center w-8 h-8 rounded-lg bg-muted text-muted-foreground hover:bg-muted/80 transition-colors" title="Edit Branch">
                             <Edit2 className="w-3.5 h-3.5" />
                           </button>
                         )}
@@ -94,13 +94,13 @@ export default function Stores() {
           <div className="fixed inset-0 bg-foreground/20 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowAdd(false)}>
             <div className="bg-card rounded-2xl border border-border p-6 w-full max-w-md animate-scale-in" onClick={e => e.stopPropagation()}>
               <div className="flex items-center justify-between mb-5">
-                <h2 className="text-base font-medium">New Store</h2>
+                <h2 className="text-base font-medium">New Branch</h2>
                 <button onClick={() => setShowAdd(false)} className="p-1 rounded-md hover:bg-muted"><X className="w-4 h-4" /></button>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block px-1">Store Name</label>
-                  <input type="text" placeholder="e.g. Downtown Flagship" value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block px-1">Branch Name</label>
+                  <input type="text" placeholder="e.g. Downtown Branch" value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
                     className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:outline-none focus:ring-2 focus:ring-ring/10 transition-all" />
                 </div>
                 <div>
@@ -119,7 +119,7 @@ export default function Stores() {
                   </select>
                 </div>
                 <button onClick={handleSubmit} className="w-full h-11 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:opacity-90 transition-opacity mt-2">
-                  Create Store
+                  Create Branch
                 </button>
               </div>
             </div>
@@ -246,9 +246,9 @@ export default function Stores() {
               <div className="p-6 border-t border-border bg-muted/30 flex justify-end gap-3">
                 <button onClick={() => setSelectedStoreId(null)} className="px-5 h-11 rounded-xl text-sm font-medium border border-border hover:bg-muted transition-colors">Close View</button>
                 {role === 'admin' && (
-                  <button onClick={() => navigate(`/stores/${selectedStore.id}/manage`)} className="px-5 h-11 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity flex items-center gap-2">
+                  <button onClick={() => navigate(`/branches/${selectedStore.id}/manage`)} className="px-5 h-11 rounded-xl text-sm font-medium bg-primary text-primary-foreground hover:opacity-90 transition-opacity flex items-center gap-2">
                     <Edit2 className="w-4 h-4" />
-                    Manage Store
+                    Manage Branch
                   </button>
                 )}
               </div>

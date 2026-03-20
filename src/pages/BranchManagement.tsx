@@ -9,7 +9,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-export default function StoreManagement() {
+export default function BranchManagement() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { stores, updateStore, staff, updateStaff, addStaff, role, logActivity } = useApp();
@@ -55,6 +55,7 @@ export default function StoreManagement() {
     if (!newStaffData.name || !newStaffData.email) return;
     addStaff({
       ...newStaffData,
+      role: newStaffData.role as 'admin' | 'manager' | 'staff',
       storeId: currentStore.id,
       status: 'active'
     });
@@ -69,12 +70,12 @@ export default function StoreManagement() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-6 animate-fade-in">
           <div className="flex items-center gap-4">
-            <button onClick={() => navigate('/stores')} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors flex-shrink-0">
+            <button onClick={() => navigate('/branches')} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors flex-shrink-0">
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="min-w-0">
               <h1 className="text-2xl font-medium tracking-tight truncate">Manage {currentStore.name}</h1>
-              <p className="text-sm text-muted-foreground font-light mt-1">Configure parameters and personnel</p>
+              <p className="text-sm text-muted-foreground font-light mt-1">Configure {currentStore?.name} details</p>
             </div>
           </div>
           <button onClick={handleSaveStore} className="flex items-center justify-center gap-2 bg-primary text-primary-foreground px-6 h-11 rounded-xl text-sm font-medium hover:shadow-lg transition-all active:scale-[0.98] w-full sm:w-auto">
@@ -86,7 +87,7 @@ export default function StoreManagement() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Main Configuration */}
           <div className="lg:col-span-2 space-y-8 animate-slide-up">
-            {/* Store Information */}
+            {/* Branch Information */}
             <section className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-8 shadow-sm">
               <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
                 <StoreIcon className="w-4 h-4 text-primary" />
@@ -94,7 +95,7 @@ export default function StoreManagement() {
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block px-1">Store Name</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block px-1">Branch Name</label>
                   <input type="text" value={formData.name} onChange={e => setFormData(p => ({ ...p, name: e.target.value }))}
                     className="w-full h-12 px-4 rounded-xl border border-border bg-background/50 focus:ring-2 focus:ring-primary/20 transition-all text-sm" />
                 </div>
@@ -105,7 +106,7 @@ export default function StoreManagement() {
                 </div>
                 <div>
                   <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block px-1">Status</label>
-                  <select value={formData.status} onChange={e => setFormData(p => ({ ...p, status: e.target.value }))}
+                  <select value={formData.status} onChange={e => setFormData(p => ({ ...p, status: e.target.value as 'active' | 'inactive' }))}
                     className="w-full h-12 px-4 rounded-xl border border-border bg-background/50 focus:ring-2 focus:ring-primary/20 transition-all text-sm">
                     <option value="active">Active</option>
                     <option value="inactive">Inactive</option>
@@ -113,7 +114,7 @@ export default function StoreManagement() {
                   </select>
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block px-1">Store Code (Internal)</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2 block px-1">Branch Code (Internal)</label>
                   <div className="w-full h-12 px-4 rounded-xl border border-border bg-muted/30 flex items-center text-sm font-mono text-muted-foreground">
                     {currentStore.code}
                   </div>
@@ -188,7 +189,7 @@ export default function StoreManagement() {
             <section className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-6 shadow-sm">
               <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
                 <Shield className="w-4 h-4 text-primary" />
-                Store Manager
+                Branch Manager
               </h2>
               <div className="space-y-4">
                 <div>
@@ -203,6 +204,7 @@ export default function StoreManagement() {
                 </div>
                 {formData.managerId && (
                   <div className="p-4 rounded-2xl bg-primary/5 border border-primary/10">
+                    <label className="text-xs text-muted-foreground mb-1.5 block">Branch Name</label>
                     <p className="text-xs text-muted-foreground leading-relaxed">
                       This manager will have full oversight of staff and activities for <strong>{formData.name}</strong>.
                     </p>
@@ -211,7 +213,7 @@ export default function StoreManagement() {
               </div>
             </section>
 
-            {/* Store Security/Access */}
+            {/* Branch Security/Access */}
             <section className="bg-card/40 backdrop-blur-xl border border-border rounded-3xl p-6 shadow-sm">
               <h2 className="text-sm font-semibold uppercase tracking-widest text-muted-foreground mb-6 flex items-center gap-2">
                 <Lock className="w-4 h-4 text-primary" />

@@ -29,7 +29,7 @@ function StatCard({ label, value, change, positive, icon: Icon, delay }: {
     </div>
   );
 }
-function ActivityItem({ activity }: { activity: typeof storeActivities[0] }) {
+function ActivityItem({ activity }: { activity: typeof mockActivities[0] }) {
   const icons = {
     staff: Users,
     inventory: Package,
@@ -219,6 +219,7 @@ function AdminDashboardContent() {
 }
 
 function ManagerDashboardContent() {
+  const { storeName } = useApp();
   const todayRevenue = dailyRevenue[4].revenue;
   const todayTx = dailyRevenue[4].transactions;
   const totalRevenue = dailyRevenue.reduce((s, d) => s + d.revenue, 0);
@@ -237,7 +238,7 @@ function ManagerDashboardContent() {
       data,
       filename: 'revenue-report',
       subtitle: 'Daily revenue and transaction tracking',
-      storeName: 'Downtown Flagship',
+      storeName: storeName || 'Store',
       summary: [
         { label: 'WEEKLY REVENUE', value: `₦${totalRevenue.toLocaleString()}` },
         { label: 'TOTAL TRANSACTIONS', value: totalTx.toString() },
@@ -348,7 +349,7 @@ function ManagerDashboardContent() {
                 data,
                 filename: 'store-transactions',
                 subtitle: 'Detailed transaction history for this location',
-                storeName: 'Downtown Flagship'
+                storeName: storeName || 'Store'
               });
             }} className="text-xs text-primary hover:underline flex items-center gap-1">
               <Download className="w-3 h-3" /> Download PDF

@@ -15,8 +15,8 @@ import Staff from "./pages/Staff";
 import POS from "./pages/POS";
 import Scanner from "./pages/Scanner";
 import Labels from "./pages/Labels";
-import Stores from "./pages/Stores";
-import StoreManagement from "./pages/StoreManagement";
+import Branches from "./pages/Branches";
+import BranchManagement from "./pages/BranchManagement";
 import SettingsPage from "./pages/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -40,8 +40,8 @@ const App = () => (
               <Route path="/pos" element={<ProtectedRoute><POS /></ProtectedRoute>} />
               <Route path="/scanner" element={<ProtectedRoute><Scanner /></ProtectedRoute>} />
               <Route path="/labels" element={<ProtectedRoute><Labels /></ProtectedRoute>} />
-              <Route path="/stores" element={<ProtectedRoute><Stores /></ProtectedRoute>} />
-              <Route path="/stores/:id/manage" element={<ProtectedRoute><StoreManagement /></ProtectedRoute>} />
+              <Route path="/branches" element={<ProtectedRoute><Branches /></ProtectedRoute>} />
+              <Route path="/branches/:id/manage" element={<ProtectedRoute><BranchManagement /></ProtectedRoute>} />
               <Route path="/settings" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
               <Route path="*" element={<NotFound />} />
             </Routes>
