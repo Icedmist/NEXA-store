@@ -4,6 +4,7 @@ import { Search, Plus, AlertTriangle, Package, X, Upload, FileSpreadsheet, Check
 import { QRCodeSVG } from 'qrcode.react';
 import { useApp } from '@/context/AppContext';
 import { categories, Product } from '@/data/demo';
+import { generateBrandedPdf } from '@/utils/PdfService';
 
 interface CSVRow {
   name: string;
@@ -65,16 +66,22 @@ export default function Inventory() {
   };
 
   const handleExportProducts = () => {
-    const csvContent = [
-      'ID,Name,Category,Price,Stock,QR Code',
-      ...filtered.map(p => `${p.id},"${p.name}","${p.category}",${p.price},${p.stock},${p.qrCode}`)
-    ].join('\n');
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `inventory-export-${new Date().toISOString().split('T')[0]}.csv`;
-    a.click();
+    const headers = ['ID', 'Name', 'Category', 'Price', 'Stock', 'QR Code'];
+    const data = filtered.map(p => [
+      p.id,
+      p.name,
+      p.category,
+      `₦${p.price.toLocaleString()}`,
+      p.stock.toString(),
+      p.qrCode
+    ]);
+    generateBrandedPdf(
+      'Inventory Report',
+      headers,
+      data,
+      `inventory-export-${new Date().toISOString().split('T')[0]}`,
+      `Current stock levels for ${categoryFilter} products`
+    );
   };
 
   const parseCSV = useCallback((text: string) => {
@@ -171,11 +178,11 @@ export default function Inventory() {
           <div className="flex flex-wrap gap-2">
             <button
               onClick={handleExportProducts}
-              title="Export CSV"
+              title="Export PDF"
               className="flex items-center justify-center gap-2 bg-card border border-border px-3 sm:px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors flex-1 sm:flex-none"
             >
               <Download className="w-4 h-4" />
-              <span className="hidden md:inline">Export</span>
+              <span className="hidden md:inline">Export PDF</span>
             </button>
             <button
               onClick={() => setShowLabels(true)}

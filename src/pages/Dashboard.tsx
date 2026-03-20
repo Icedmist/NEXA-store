@@ -1,6 +1,11 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
-import { TrendingUp, DollarSign, ShoppingBag, Store, ArrowUpRight, ArrowDownRight, Download, Users, Package, Bell, ClipboardList } from 'lucide-react';
+import { 
+  TrendingUp, TrendingDown, DollarSign, ShoppingBag, 
+  Store, Clock, ArrowRight, Download, Calendar, Filter,
+  Users, Package, Bell, ClipboardList, ArrowUpRight, ArrowDownRight
+} from 'lucide-react';
+import { generateBrandedPdf } from '@/utils/PdfService';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Tooltip, LineChart, Line, CartesianGrid, Legend } from 'recharts';
 import { dailyRevenue, paymentBreakdown, recentTransactions, topProducts, profitAndLoss, storeActivities as mockActivities } from '@/data/demo';
 
@@ -93,20 +98,24 @@ function AdminDashboardContent() {
           <p className="text-sm text-muted-foreground font-light mt-1">Overview across all stores</p>
         </div>
         <button onClick={() => {
-          const csvLines = [
-            'Month,Revenue,Expenses,Profit',
-            ...profitAndLoss.map(d => `${d.month},${d.revenue},${d.expenses},${d.profit}`)
-          ].join('\n');
-          const blob = new Blob([csvLines], { type: 'text/csv' });
-          const url = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'pnl-report.csv';
-          a.click();
+          const headers = ['Month', 'Revenue', 'Expenses', 'Profit'];
+          const data = profitAndLoss.map(d => [
+            d.month,
+            `₦${d.revenue.toLocaleString()}`,
+            `₦${d.expenses.toLocaleString()}`,
+            `₦${d.profit.toLocaleString()}`
+          ]);
+          generateBrandedPdf(
+            'Profit & Loss Report',
+            headers,
+            data,
+            'pnl-report',
+            'Financial overview across all stores'
+          );
         }}
           className="flex items-center justify-center gap-2 bg-card/60 backdrop-blur-md border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors w-full sm:w-auto">
           <Download className="w-4 h-4" />
-          Export P&L
+          Export P&L Report
         </button>
       </div>
 
@@ -154,18 +163,23 @@ function AdminDashboardContent() {
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm font-medium">Recent Transactions</p>
           <button onClick={() => {
-            const csv = [
-              'ID,Items Count,Total,Payment,Cashier',
-              ...recentTransactions.map(tx => `${tx.id},${tx.items.length},${tx.total},${tx.paymentMethod},${tx.cashier}`)
-            ].join('\n');
-            const blob = new Blob([csv], { type: 'text/csv' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'transactions-history.csv';
-            a.click();
+            const headers = ['ID', 'Items', 'Total', 'Payment', 'Cashier'];
+            const data = recentTransactions.map(tx => [
+              tx.id,
+              tx.items.length.toString(),
+              `₦${tx.total.toLocaleString()}`,
+              tx.paymentMethod,
+              tx.cashier
+            ]);
+            generateBrandedPdf(
+              'Transactions History',
+              headers,
+              data,
+              'transactions-history',
+              'Aggregate transaction record for all locations'
+            );
           }} className="text-xs text-primary hover:underline flex items-center gap-1">
-            <Download className="w-3 h-3" /> Download History
+            <Download className="w-3 h-3" /> Download PDF History
           </button>
         </div>
         <div className="overflow-x-auto">
@@ -307,18 +321,22 @@ function ManagerDashboardContent() {
           <div className="flex items-center justify-between mb-4">
             <p className="text-sm font-medium">Recent Transactions</p>
             <button onClick={() => {
-              const csv = [
-                'ID,Items Count,Total,Payment',
-                ...recentTransactions.map(tx => `${tx.id},${tx.items.length},${tx.total},${tx.paymentMethod}`)
-              ].join('\n');
-              const blob = new Blob([csv], { type: 'text/csv' });
-              const url = URL.createObjectURL(blob);
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = 'store-transactions.csv';
-              a.click();
+              const headers = ['ID', 'Items', 'Total', 'Payment'];
+              const data = recentTransactions.map(tx => [
+                tx.id,
+                tx.items.length.toString(),
+                `₦${tx.total.toLocaleString()}`,
+                tx.paymentMethod
+              ]);
+              generateBrandedPdf(
+                'Store Sales Log',
+                headers,
+                data,
+                'store-transactions',
+                'Detailed transaction history for this location'
+              );
             }} className="text-xs text-primary hover:underline flex items-center gap-1">
-              <Download className="w-3 h-3" /> Download CSV
+              <Download className="w-3 h-3" /> Download PDF
             </button>
           </div>
           <div className="overflow-x-auto">
