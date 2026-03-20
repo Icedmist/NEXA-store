@@ -7,7 +7,7 @@ import { ShieldCheck, Store, ScanLine, ArrowRight } from 'lucide-react';
 const roles: { id: Role; label: string; desc: string; icon: typeof ShieldCheck }[] = [
   { id: 'admin', label: 'Administrator', desc: 'Global oversight and store management', icon: ShieldCheck },
   { id: 'manager', label: 'Store Manager', desc: 'Inventory, staff, and local analytics', icon: Store },
-  { id: 'cashier', label: 'Cashier', desc: 'Point of sale and QR scanning', icon: ScanLine },
+  { id: 'staff', label: 'Staff', desc: 'Point of sale and QR scanning', icon: ScanLine },
 ];
 
 export default function Login() {
@@ -21,7 +21,7 @@ export default function Login() {
     setEntering(true);
     setTimeout(() => {
       setRole(selected);
-      navigate(selected === 'cashier' ? '/pos' : '/dashboard');
+      navigate(selected === 'staff' ? '/pos' : '/dashboard');
     }, 300);
   };
 
@@ -30,8 +30,8 @@ export default function Login() {
       <div className={`w-full max-w-md transition-all duration-300 ${entering ? 'opacity-0 scale-95' : 'opacity-100 scale-100'}`}>
         {/* Header */}
         <div className="text-center mb-10 animate-fade-in">
-          <div className="w-14 h-14 bg-primary rounded-2xl flex items-center justify-center mx-auto mb-5">
-            <span className="text-primary-foreground text-lg font-semibold tracking-tight">NX</span>
+          <div className="w-24 h-24 mx-auto mb-5 transition-transform hover:scale-105 duration-300 drop-shadow-lg">
+            <img src="/logo.png" alt="Nexa Logo" className="w-full h-full object-contain" />
           </div>
           <h1 className="text-2xl font-medium tracking-tight">Nexa Store OS</h1>
           <p className="text-sm text-muted-foreground mt-2 font-light">Select your role to continue</p>

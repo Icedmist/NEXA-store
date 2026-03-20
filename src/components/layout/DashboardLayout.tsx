@@ -1,8 +1,8 @@
 import { useApp } from '@/context/AppContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Package, Users, BarChart3, Settings, QrCode,
-  ShoppingCart, Tag, Store, LogOut, Wifi, WifiOff
+  LayoutDashboard, Package, Users, Settings,
+  Calculator, ScanLine, Printer, Receipt, Store, LogOut, Wifi, WifiOff
 } from 'lucide-react';
 import { useState } from 'react';
 import { ModeToggle } from '@/components/ModeToggle';
@@ -19,9 +19,11 @@ const navItems = {
     { label: 'Staff', path: '/staff', icon: Users },
     { label: 'Settings', path: '/settings', icon: Settings },
   ],
-  cashier: [
-    { label: 'POS', path: '/pos', icon: ShoppingCart },
-    { label: 'Scanner', path: '/scanner', icon: QrCode },
+  staff: [
+    { label: 'POS', icon: Calculator, path: '/pos' },
+    { label: 'Scanner', icon: ScanLine, path: '/scanner' },
+    { label: 'Labels', icon: Printer, path: '/labels' },
+    { label: 'Sales', icon: Receipt, path: '/dashboard' },
   ],
 };
 
@@ -40,9 +42,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       {/* Top bar */}
       <header className="h-16 glass dark:glass border-b border-border/50 flex items-center justify-between px-4 lg:px-8 sticky top-0 z-50">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 shadow-sm transition-transform hover:rotate-6">
-            <span className="text-primary font-bold text-sm tracking-tight">NX</span>
-          </div>
+          <img src="/logo.png" alt="Nexa Logo" className="w-9 h-9 object-contain drop-shadow transition-transform hover:rotate-3" />
           <div className="flex flex-col">
             <p className="text-sm font-bold tracking-tight leading-none text-foreground">Nexa Retail</p>
             <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mt-1">{storeName}</p>

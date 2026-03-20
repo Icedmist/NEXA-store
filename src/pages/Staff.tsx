@@ -7,7 +7,7 @@ export default function Staff() {
   const { staff: allStaff, stores, addStaff, updateStaff, role, staff: currentStaffMembers } = useApp();
   const [showAdd, setShowAdd] = useState(false);
   const [editingStaff, setEditingStaff] = useState<string | null>(null);
-  const [formData, setFormData] = useState({ name: '', email: '', role: 'cashier' as 'cashier' | 'manager', storeId: '', password: '' });
+  const [formData, setFormData] = useState({ name: '', email: '', role: 'staff' as 'staff' | 'manager', storeId: '', password: '' });
 
   // Filter staff based on role
   // For demo: suppose 'st3' is the current manager logging in (Clara)
@@ -26,7 +26,7 @@ export default function Staff() {
     } else {
       addStaff(formData);
     }
-    setFormData({ name: '', email: '', role: 'cashier', storeId: '', password: '' });
+    setFormData({ name: '', email: '', role: 'staff', storeId: '', password: '' });
     setShowAdd(false);
     setEditingStaff(null);
   };
@@ -60,7 +60,7 @@ export default function Staff() {
           <button onClick={() => setShowAdd(true)}
             className="flex items-center gap-2 bg-primary text-primary-foreground px-4 h-10 rounded-xl text-sm font-medium hover:shadow-md transition-shadow">
             <Plus className="w-4 h-4" />
-            Add Cashier
+            Add Staff
           </button>
         </div>
 
@@ -122,7 +122,7 @@ export default function Staff() {
                     <select value={formData.role} onChange={e => setFormData(p => ({ ...p, role: e.target.value as any }))}
                       className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:outline-none focus:ring-2 focus:ring-ring/10"
                       disabled={role !== 'admin'}>
-                      <option value="cashier">Cashier</option>
+                      <option value="staff">Staff</option>
                       <option value="manager">Manager</option>
                     </select>
                   </div>

@@ -183,8 +183,8 @@ export default function LandingPage() {
               
               <div className="w-full max-w-[1000px] flex flex-col justify-center items-center gap-6 sm:gap-8 md:gap-10 relative z-10 animate-fade-in">
                 <div className="self-stretch flex flex-col justify-center items-center gap-6 sm:gap-8">
-                  <div className="w-full max-w-[900px] text-center flex justify-center flex-col text-[#37322F] dark:text-white text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[92px] font-bold leading-[1.02] tracking-[-0.03em] font-serif">
-                    Retail management <span className="text-accent underline decoration-accent/20 underline-offset-[12px]">offline first</span>
+                  <div className="w-full max-w-[1100px] text-center flex justify-center flex-col text-[#37322F] dark:text-white text-5xl xs:text-6xl sm:text-7xl md:text-8xl lg:text-[112px] font-bold leading-[1.05] tracking-[-0.03em] font-serif">
+                    Retail management <span className="text-accent underline decoration-accent/20 underline-offset-[14px]">offline first</span>
                   </div>
                   <div className="w-full max-w-[640px] text-center flex justify-center flex-col text-[#605A57] dark:text-gray-400 text-lg sm:text-xl md:text-2xl leading-relaxed font-sans px-2 font-medium tracking-tight">
                     Run your store with confidence. Sell, scan, and track inventory anywhere, even without internet.
@@ -193,14 +193,14 @@ export default function LandingPage() {
               </div>
 
               {/* CTA Button */}
-              <div className="w-full max-w-[500px] flex flex-col justify-center items-center gap-8 relative z-10 mt-10 animate-fade-in stagger-2">
+              <div className="w-full max-w-[600px] flex flex-col justify-center items-center gap-8 relative z-10 mt-12 animate-fade-in stagger-2">
                 <div className="flex justify-start items-center gap-4">
                   <div
                     onClick={() => navigate("/register")}
-                    className="h-12 sm:h-14 px-10 sm:px-14 py-3 bg-primary text-primary-foreground shadow-[0_20px_50px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_50px_rgba(255,255,255,0.05)] rounded-full flex justify-center items-center cursor-pointer hover:scale-105 transition-all duration-500 active:scale-95 group relative overflow-hidden"
+                    className="h-16 sm:h-20 px-12 sm:px-20 py-4 bg-primary text-primary-foreground shadow-[0_20px_50px_rgba(0,0,0,0.15)] dark:shadow-[0_20px_50px_rgba(255,255,255,0.1)] rounded-full flex justify-center items-center cursor-pointer hover:scale-105 transition-all duration-500 active:scale-95 group relative overflow-hidden"
                   >
                     <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                    <div className="flex flex-col justify-center text-sm sm:text-base md:text-lg font-bold tracking-tight">
+                    <div className="flex flex-col justify-center text-lg sm:text-xl md:text-2xl font-bold tracking-tight">
                       Get Started for Free
                     </div>
                   </div>
