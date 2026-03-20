@@ -17,7 +17,7 @@ export default function StoreRegistrationSection() {
     e.preventDefault();
     setLoading(true);
     try {
-      await registerStore(formData.name, formData.email);
+      await registerStore(formData.name, formData.email, formData.password);
       navigate('/dashboard');
     } catch (error) {
       console.error(error);

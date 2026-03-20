@@ -26,7 +26,7 @@ export interface StaffMember {
   id: string;
   name: string;
   email: string;
-  role: 'staff' | 'manager';
+  role: Role;
   status: 'active' | 'inactive';
   initials: string;
   storeId?: string;
