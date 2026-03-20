@@ -282,7 +282,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
     logActivity(`New store "${store.name}" created`, 'Admin');
 
     try {
-      await supabase.from('stores').insert([newStore]);
+      const slug = newStore.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const dbStore = {
+        id: newStore.id,
+        name: newStore.name,
+        location: newStore.location,
+        code: newStore.code,
+        status: newStore.status,
+        revenue: newStore.revenue,
+        transactions: newStore.transactions,
+        manager_id: newStore.managerId || null,
+        slug
+      };
+
+      const storeRes = await supabase.from('stores').insert([dbStore]);
+      if (storeRes.error) {
+        if (storeRes.error.code === 'PGRST204' || storeRes.error.message.includes('slug')) {
+          console.warn('Backend schema outdated. Falling back to insert without slug.');
+          const fallbackStore = { ...dbStore };
+          delete (fallbackStore as any).slug;
+          await supabase.from('stores').insert([fallbackStore]);
+        } else {
+          throw storeRes.error;
+        }
+      }
     } catch (e) {
       console.error('Failed to sync addStore to Supabase', e);
     }
@@ -294,7 +317,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     logActivity(`Store "${store?.name}" updated`, 'Admin', id);
 
     try {
-      await supabase.from('stores').update(updates).eq('id', id);
+      const dbUpdates: any = { ...updates };
+      if (updates.managerId !== undefined) {
+        dbUpdates.manager_id = updates.managerId || null;
+        delete dbUpdates.managerId;
+      }
+      if (updates.name !== undefined) {
+        dbUpdates.slug = updates.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      }
+
+      const res = await supabase.from('stores').update(dbUpdates).eq('id', id);
+      if (res.error && (res.error.code === 'PGRST204' || res.error.message.includes('slug'))) {
+        delete dbUpdates.slug;
+        await supabase.from('stores').update(dbUpdates).eq('id', id);
+      }
     } catch (e) {
       console.error('Failed to sync updateStore to Supabase', e);
     }
