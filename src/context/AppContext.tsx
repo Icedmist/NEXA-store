@@ -63,33 +63,16 @@ export function AppProvider({ children }: { children: ReactNode }) {
           throw new Error('Supabase fetch failed');
         }
 
-        if (dbStores) {
-          setStores(dbStores.map((s: any) => ({
-            ...s,
-            managerId: s.manager_id
-          })));
-        }
-        if (dbProducts) {
-          setProducts(dbProducts.map((p: any) => ({
-            ...p,
-            qrCode: p.qr_code,
-            lowStockThreshold: p.low_stock_threshold
-          })));
-        }
-        if (dbStaff) {
-          setStaff(dbStaff.map((s: any) => ({
-            ...s,
-            storeId: s.store_id,
-            tempPassword: s.password_hash
-          })));
-        }
+        if (dbStores) setStores(dbStores);
+        if (dbProducts) setProducts(dbProducts);
+        if (dbStaff) setStaff(dbStaff);
 
         const { data: dbTxns } = await supabase.from('transactions').select('*');
         if (dbTxns) {
           setTransactions(dbTxns.map((t: any) => ({
-             ...t,
-             paymentMethod: t.payment_method,
-             timestamp: t.timestamp
+            ...t,
+            paymentMethod: t.payment_method,
+            timestamp: t.timestamp
           })));
         }
 
@@ -219,14 +202,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       let storeErr = null;
       const storeRes = await supabase.from('stores').insert([{ ...newStore, slug }]);
-      
+
       if (storeRes.error) {
         if (storeRes.error.code === 'PGRST204' || storeRes.error.message.includes('slug')) {
-           console.warn('Backend schema outdated. Falling back to insert without slug.');
-           const fallbackRes = await supabase.from('stores').insert([newStore]);
-           storeErr = fallbackRes.error;
+          console.warn('Backend schema outdated. Falling back to insert without slug.');
+          const fallbackRes = await supabase.from('stores').insert([newStore]);
+          storeErr = fallbackRes.error;
         } else {
-           storeErr = storeRes.error;
+          storeErr = storeRes.error;
         }
       }
       if (storeErr) throw storeErr;
@@ -257,18 +240,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       if (staffRes.error) {
         if (staffRes.error.code === 'PGRST204' || staffRes.error.message.includes('password_hash')) {
-           const fallbackRes2 = await supabase.from('staff_members').insert([{
-             id: userId,
-             name: newStaff.name,
-             email,
-             role: newStaff.role,
-             status: newStaff.status,
-             initials,
-             store_id: newStoreId
-           }]);
-           staffErr = fallbackRes2.error;
+          const fallbackRes2 = await supabase.from('staff_members').insert([{
+            id: userId,
+            name: newStaff.name,
+            email,
+            role: newStaff.role,
+            status: newStaff.status,
+            initials,
+            store_id: newStoreId
+          }]);
+          staffErr = fallbackRes2.error;
         } else {
-           staffErr = staffRes.error;
+          staffErr = staffRes.error;
         }
       }
 
@@ -279,7 +262,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setStaff(prev => [newStaff, ...prev]);
       setStoreName(name);
       setRole('admin');
-      
+
     } catch (e) {
       console.error('Failed to register store in Supabase', e);
       throw e;
@@ -297,7 +280,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setStores(prev => [newStore, ...prev]);
     logActivity(`New store "${store.name}" created`, 'Admin');
-    
+
     try {
       await supabase.from('stores').insert([newStore]);
     } catch (e) {
@@ -316,7 +299,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       console.error('Failed to sync updateStore to Supabase', e);
     }
   };
-  
+
   const addProduct = async (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => {
     const newProduct: Product = {
       ...product,
@@ -405,7 +388,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const resUpdate = await supabase.from('staff_members').update(dbUpdates).eq('id', id);
     if (resUpdate.error) {
-       console.error('Failed to sync updateStaff to Supabase', resUpdate.error);
+      console.error('Failed to sync updateStaff to Supabase', resUpdate.error);
     }
   };
 
@@ -462,7 +445,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       role, setRole, storeName, setStoreName, registerStore,
-      stores, staff, products, transactions, notifications, addStore, updateStore, addStaff, updateStaff, 
+      stores, staff, products, transactions, notifications, addStore, updateStore, addStaff, updateStaff,
       addProduct, updateProduct, deleteProduct, logActivity,
       cart, addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout, addTransaction
     }}>
