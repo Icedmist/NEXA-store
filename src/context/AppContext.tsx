@@ -33,7 +33,10 @@ const AppContext = createContext<AppContextType | null>(null);
 export function AppProvider({ children }: { children: ReactNode }) {
   const [role, setRole] = useState<Role | null>(() => {
     const saved = localStorage.getItem('nexa-role');
-    return saved ? (JSON.parse(saved) as Role) : 'admin';
+    let parsed = saved ? JSON.parse(saved) : null;
+    if (parsed === 'cashier') parsed = 'staff';
+    if (parsed && !['admin', 'manager', 'staff'].includes(parsed)) parsed = null;
+    return parsed as Role | null;
   });
   const [storeName, setStoreName] = useState<string | null>('Downtown Flagship');
   const [stores, setStores] = useState<Store[]>(initialStores);
