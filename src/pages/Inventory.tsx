@@ -75,13 +75,18 @@ export default function Inventory() {
       p.stock.toString(),
       p.qrCode
     ]);
-    generateBrandedPdf(
-      'Inventory Report',
+    generateBrandedPdf({
+      title: 'Inventory Report',
       headers,
       data,
-      `inventory-export-${new Date().toISOString().split('T')[0]}`,
-      `Current stock levels for ${categoryFilter} products`
-    );
+      filename: `inventory-export-${new Date().toISOString().split('T')[0]}`,
+      subtitle: `Current stock levels for ${categoryFilter} products`,
+      summary: [
+        { label: 'TOTAL PRODUCTS', value: products.length.toString() },
+        { label: 'LOW STOCK ITEMS', value: lowStockCount.toString() },
+        { label: 'TOTAL VALUE', value: `₦${filtered.reduce((acc, p) => acc + (p.price * p.stock), 0).toLocaleString()}` }
+      ]
+    });
   };
 
   const parseCSV = useCallback((text: string) => {

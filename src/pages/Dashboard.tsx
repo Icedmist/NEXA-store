@@ -105,13 +105,18 @@ function AdminDashboardContent() {
             `₦${d.expenses.toLocaleString()}`,
             `₦${d.profit.toLocaleString()}`
           ]);
-          generateBrandedPdf(
-            'Profit & Loss Report',
+          generateBrandedPdf({
+            title: 'Profit & Loss Report',
             headers,
             data,
-            'pnl-report',
-            'Financial overview across all stores'
-          );
+            filename: 'pnl-report',
+            subtitle: 'Financial overview across all stores',
+            summary: [
+              { label: 'TOTAL REVENUE', value: `₦${totalRevenue.toLocaleString()}` },
+              { label: 'TRANSACTIONS', value: totalTransactions.toString() },
+              { label: 'ACTIVE STORES', value: stores.filter(s => s.status === 'active').length.toString() }
+            ]
+          });
         }}
           className="flex items-center justify-center gap-2 bg-card/60 backdrop-blur-md border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors w-full sm:w-auto">
           <Download className="w-4 h-4" />
@@ -171,13 +176,13 @@ function AdminDashboardContent() {
               tx.paymentMethod,
               tx.cashier
             ]);
-            generateBrandedPdf(
-              'Transactions History',
+            generateBrandedPdf({
+              title: 'Transactions History',
               headers,
               data,
-              'transactions-history',
-              'Aggregate transaction record for all locations'
-            );
+              filename: 'transactions-history',
+              subtitle: 'Aggregate transaction record for all locations'
+            });
           }} className="text-xs text-primary hover:underline flex items-center gap-1">
             <Download className="w-3 h-3" /> Download PDF History
           </button>
@@ -220,16 +225,25 @@ function ManagerDashboardContent() {
   const totalTx = dailyRevenue.reduce((s, d) => s + d.transactions, 0);
 
   const handleExport = () => {
-    const csv = [
-      'Day,Revenue,Transactions',
-      ...dailyRevenue.map(d => `${d.day},${d.revenue},${d.transactions}`),
-    ].join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'revenue-report.csv';
-    a.click();
+    const headers = ['Day', 'Revenue', 'Transactions'];
+    const data = dailyRevenue.map(d => [
+      d.day,
+      `₦${d.revenue.toLocaleString()}`,
+      d.transactions.toString()
+    ]);
+    generateBrandedPdf({
+      title: 'Store Performance Report',
+      headers,
+      data,
+      filename: 'revenue-report',
+      subtitle: 'Daily revenue and transaction tracking',
+      storeName: 'Downtown Flagship',
+      summary: [
+        { label: 'WEEKLY REVENUE', value: `₦${totalRevenue.toLocaleString()}` },
+        { label: 'TOTAL TRANSACTIONS', value: totalTx.toString() },
+        { label: 'TODAY\'S REVENUE', value: `₦${todayRevenue.toLocaleString()}` }
+      ]
+    });
   };
 
   return (
@@ -242,7 +256,7 @@ function ManagerDashboardContent() {
         <button onClick={handleExport}
           className="flex items-center gap-2 bg-card/60 backdrop-blur-md border border-border px-4 h-10 rounded-xl text-sm font-normal hover:bg-muted transition-colors">
           <Download className="w-4 h-4" />
-          Export CSV
+          Export PDF Report
         </button>
       </div>
 
@@ -328,13 +342,14 @@ function ManagerDashboardContent() {
                 `₦${tx.total.toLocaleString()}`,
                 tx.paymentMethod
               ]);
-              generateBrandedPdf(
-                'Store Sales Log',
+              generateBrandedPdf({
+                title: 'Store Sales Log',
                 headers,
                 data,
-                'store-transactions',
-                'Detailed transaction history for this location'
-              );
+                filename: 'store-transactions',
+                subtitle: 'Detailed transaction history for this location',
+                storeName: 'Downtown Flagship'
+              });
             }} className="text-xs text-primary hover:underline flex items-center gap-1">
               <Download className="w-3 h-3" /> Download PDF
             </button>
