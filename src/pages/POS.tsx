@@ -7,14 +7,15 @@ import { Minus, Plus, Trash2, CreditCard, Banknote, Smartphone, Check, ShoppingC
 type PaymentMethod = 'cash' | 'card' | 'mobile';
 
 export default function POS() {
-  const { cart, addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount } = useApp();
+  const appCtx = useApp();
+  const { cart = [], addToCart, removeFromCart, updateCartQty, clearCart, cartTotal = 0, cartCount = 0 } = appCtx || {};
   const [search, setSearch] = useState('');
   const [showCheckout, setShowCheckout] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
   const [showReceipt, setShowReceipt] = useState(false);
   const [receiptId, setReceiptId] = useState('');
 
-  const filtered = allProducts.filter(p => p.name.toLowerCase().includes(search.toLowerCase()));
+  const filtered = Array.isArray(allProducts) ? allProducts.filter(p => p?.name?.toLowerCase().includes(search.toLowerCase())) : [];
 
   const handleCheckout = () => {
     setReceiptId(`RCP-${Date.now().toString().slice(-6)}`);
@@ -51,13 +52,13 @@ export default function POS() {
           <div className="flex-1 overflow-y-auto grid grid-cols-2 sm:grid-cols-3 gap-2 content-start">
             {filtered.map((product, i) => (
               <button
-                key={product.id}
-                onClick={() => addToCart(product)}
+                key={product?.id || i}
+                onClick={() => addToCart && product && addToCart(product)}
                 className={`bg-card/60 backdrop-blur-md rounded-xl border border-border p-3 text-left hover:border-primary/20 hover:shadow-sm transition-all animate-fade-in stagger-${Math.min(i + 1, 6)}`}
               >
-                <span className="text-xl">{product.image}</span>
-                <p className="text-xs font-medium mt-2 leading-tight line-clamp-2">{product.name}</p>
-                <p className="text-sm font-medium tabular-nums mt-1">₦{product.price.toLocaleString()}</p>
+                <span className="text-xl">{product?.image || '📦'}</span>
+                <p className="text-xs font-medium mt-2 leading-tight line-clamp-2">{product?.name || 'Unnamed'}</p>
+                <p className="text-sm font-medium tabular-nums mt-1">₦{product?.price?.toLocaleString() || 0}</p>
               </button>
             ))}
           </div>
@@ -72,7 +73,7 @@ export default function POS() {
             </div>
           </div>
 
-          {cart.length === 0 ? (
+          {(!cart || cart.length === 0) ? (
             <div className="flex-1 flex items-center justify-center p-8">
               <div className="text-center">
                 <ShoppingCart className="w-8 h-8 text-muted-foreground/30 mx-auto mb-2" />
@@ -82,17 +83,17 @@ export default function POS() {
           ) : (
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
               {cart.map(item => (
-                <div key={item.id} className="flex items-center gap-3 p-2 rounded-lg">
+                <div key={item?.id} className="flex items-center gap-3 p-2 rounded-lg">
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium truncate">{item.name}</p>
-                    <p className="text-xs text-muted-foreground tabular-nums">₦{item.price.toLocaleString()}</p>
+                    <p className="text-xs font-medium truncate">{item?.name}</p>
+                    <p className="text-xs text-muted-foreground tabular-nums">₦{item?.price?.toLocaleString()}</p>
                   </div>
                   <div className="flex items-center gap-1">
                     <button onClick={() => updateCartQty(item.id, item.qty - 1)}
                       className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80">
                       <Minus className="w-3 h-3" />
                     </button>
-                    <span className="text-xs tabular-nums w-6 text-center font-medium">{item.qty}</span>
+                    <span className="text-xs tabular-nums w-6 text-center font-medium">{item?.qty}</span>
                     <button onClick={() => updateCartQty(item.id, item.qty + 1)}
                       className="w-7 h-7 rounded-lg bg-muted flex items-center justify-center hover:bg-muted/80">
                       <Plus className="w-3 h-3" />
@@ -110,13 +111,13 @@ export default function POS() {
           <div className="p-4 border-t border-border space-y-3">
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Total</span>
-              <span className="font-medium tabular-nums text-base">₦{cartTotal.toLocaleString()}</span>
+              <span className="font-medium tabular-nums text-base">₦{(cartTotal || 0).toLocaleString()}</span>
             </div>
             <button
               onClick={() => setShowCheckout(true)}
-              disabled={cart.length === 0}
+              disabled={!cart || cart.length === 0}
               className={`w-full h-11 rounded-xl text-sm font-medium transition-all
-                ${cart.length > 0
+                ${cart && cart.length > 0
                   ? 'bg-primary text-primary-foreground hover:shadow-md'
                   : 'bg-muted text-muted-foreground cursor-not-allowed'
                 }`}

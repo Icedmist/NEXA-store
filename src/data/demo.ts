@@ -1,4 +1,4 @@
-export type Role = 'admin' | 'manager' | 'cashier';
+export type Role = 'admin' | 'manager' | 'staff';
 
 export interface Store {
   id: string;
@@ -26,7 +26,7 @@ export interface StaffMember {
   id: string;
   name: string;
   email: string;
-  role: 'cashier' | 'manager';
+  role: 'staff' | 'manager';
   status: 'active' | 'inactive';
   initials: string;
   storeId?: string;
@@ -68,10 +68,10 @@ export const products: Product[] = [
 ];
 
 export const staff: StaffMember[] = [
-  { id: 'st1', name: 'Amina Osei', email: 'amina@nexa.co', role: 'cashier', status: 'active', initials: 'AO', storeId: 's1', password: 'password123' },
-  { id: 'st2', name: 'Brian Kamau', email: 'brian@nexa.co', role: 'cashier', status: 'active', initials: 'BK', storeId: 's1', password: 'password123' },
+  { id: 'st1', name: 'Amina Osei', email: 'amina@nexa.co', role: 'staff', status: 'active', initials: 'AO', storeId: 's1', password: 'password123' },
+  { id: 'st2', name: 'Brian Kamau', email: 'brian@nexa.co', role: 'staff', status: 'active', initials: 'BK', storeId: 's1', password: 'password123' },
   { id: 'st3', name: 'Clara Wanjiku', email: 'clara@nexa.co', role: 'manager', status: 'active', initials: 'CW', storeId: 's1', password: 'password123' },
-  { id: 'st4', name: 'David Otieno', email: 'david@nexa.co', role: 'cashier', status: 'inactive', initials: 'DO', storeId: 's2', password: 'password123' },
+  { id: 'st4', name: 'David Otieno', email: 'david@nexa.co', role: 'staff', status: 'inactive', initials: 'DO', storeId: 's2', password: 'password123' },
 ];
 
 export const recentTransactions: Transaction[] = [
