@@ -2,9 +2,9 @@ import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
 import { useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { 
-  ArrowLeft, Save, Users, Settings, Shield, Activity, 
-  MapPin, Store as StoreIcon, Trash2, Plus, Edit3, 
+import {
+  ArrowLeft, Save, Users, Settings, Shield, Activity,
+  MapPin, Store as StoreIcon, Trash2, Plus, Edit3,
   Mail, Phone, Lock, ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -13,7 +13,7 @@ export default function BranchManagement() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { stores, updateStore, staff, updateStaff, addStaff, role, logActivity } = useApp();
-  
+
   const currentStore = stores.find(s => s.id === id);
   const storeStaff = staff.filter(s => s.storeId === id);
   const managers = staff.filter(s => s.role === 'manager');
@@ -256,7 +256,7 @@ export default function BranchManagement() {
                   <Plus className="w-4 h-4 rotate-45" />
                 </button>
               </div>
-              
+
               <div className="space-y-5">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
@@ -283,7 +283,7 @@ export default function BranchManagement() {
                   <input type="password" placeholder="••••••••" value={newStaffData.password} onChange={e => setNewStaffData(p => ({ ...p, password: e.target.value }))}
                     className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all" />
                 </div>
-                
+
                 <button onClick={handleAddStaffToStore} className="w-full h-12 bg-primary text-primary-foreground rounded-2xl text-sm font-medium hover:opacity-90 transition-opacity mt-2 flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                   <Plus className="w-4 h-4" />
                   Complete Onboarding

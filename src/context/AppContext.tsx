@@ -70,9 +70,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
         const { data: dbTxns } = await supabase.from('transactions').select('*');
         if (dbTxns) {
           setTransactions(dbTxns.map((t: any) => ({
-             ...t,
-             paymentMethod: t.payment_method,
-             timestamp: t.timestamp
+            ...t,
+            paymentMethod: t.payment_method,
+            timestamp: t.timestamp
           })));
         }
 
@@ -202,14 +202,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
       let storeErr = null;
       const storeRes = await supabase.from('stores').insert([{ ...newStore, slug }]);
-      
+
       if (storeRes.error) {
         if (storeRes.error.code === 'PGRST204' || storeRes.error.message.includes('slug')) {
-           console.warn('Backend schema outdated. Falling back to insert without slug.');
-           const fallbackRes = await supabase.from('stores').insert([newStore]);
-           storeErr = fallbackRes.error;
+          console.warn('Backend schema outdated. Falling back to insert without slug.');
+          const fallbackRes = await supabase.from('stores').insert([newStore]);
+          storeErr = fallbackRes.error;
         } else {
-           storeErr = storeRes.error;
+          storeErr = storeRes.error;
         }
       }
       if (storeErr) throw storeErr;
@@ -235,23 +235,23 @@ export function AppProvider({ children }: { children: ReactNode }) {
         status: newStaff.status,
         initials,
         store_id: newStoreId,
-        temp_password: null // Admins don't need this
+        password_hash: null // Admins don't need this
       }]);
 
       if (staffRes.error) {
-        if (staffRes.error.code === 'PGRST204' || staffRes.error.message.includes('temp_password')) {
-           const fallbackRes2 = await supabase.from('staff_members').insert([{
-             id: userId,
-             name: newStaff.name,
-             email,
-             role: newStaff.role,
-             status: newStaff.status,
-             initials,
-             store_id: newStoreId
-           }]);
-           staffErr = fallbackRes2.error;
+        if (staffRes.error.code === 'PGRST204' || staffRes.error.message.includes('password_hash')) {
+          const fallbackRes2 = await supabase.from('staff_members').insert([{
+            id: userId,
+            name: newStaff.name,
+            email,
+            role: newStaff.role,
+            status: newStaff.status,
+            initials,
+            store_id: newStoreId
+          }]);
+          staffErr = fallbackRes2.error;
         } else {
-           staffErr = staffRes.error;
+          staffErr = staffRes.error;
         }
       }
 
@@ -262,7 +262,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setStaff(prev => [newStaff, ...prev]);
       setStoreName(name);
       setRole('admin');
-      
+
     } catch (e) {
       console.error('Failed to register store in Supabase', e);
       throw e;
@@ -280,7 +280,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     };
     setStores(prev => [newStore, ...prev]);
     logActivity(`New store "${store.name}" created`, 'Admin');
-    
+
     try {
       await supabase.from('stores').insert([newStore]);
     } catch (e) {
@@ -299,7 +299,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       console.error('Failed to sync updateStore to Supabase', e);
     }
   };
-  
+
   const addProduct = async (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => {
     const newProduct: Product = {
       ...product,
@@ -352,22 +352,22 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setStaff(prev => [newMember, ...prev]);
     logActivity(`Staff member "${member.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
 
-    try {
-      await supabase.from('staff_members').insert([{
-        id: newMember.id,
-        name: newMember.name,
-        email: newMember.email,
-        role: newMember.role,
-        status: newMember.status,
-        initials: newMember.initials,
-        store_id: newMember.storeId,
-        temp_password: newMember.tempPassword
-      }]);
-    } catch (e: any) {
-      if (e?.code === 'PGRST204' || e?.message?.includes('temp_password')) {
-        alert('Supabase Cache Error! Your new manager/staff cannot be saved yet.\n\nTo fix this: Go to your Supabase Dashboard -> Table Editor -> "staff_members".\nClick "Add Column", name it "dummy", hit Save, and then delete it.\n\nThis forces Supabase to refresh its cache so your passwords can save!');
+    const res = await supabase.from('staff_members').insert([{
+      id: newMember.id,
+      name: newMember.name,
+      email: newMember.email,
+      role: newMember.role,
+      status: newMember.status,
+      initials: newMember.initials,
+      store_id: newMember.storeId,
+      password_hash: newMember.tempPassword
+    }]);
+
+    if (res.error) {
+      if (res.error.code === 'PGRST204' || res.error.message?.includes('password_hash')) {
+        alert('Supabase Cache Error! Your new manager/staff cannot securely log in yet.\n\nTo fix this:\n1. Open Supabase Dashboard -> Table Editor\n2. Open "staff_members"\n3. Click "Add Column", name it "dummy", hit Save, then delete it.\n\nThis forces Supabase to refresh its cache so passwords save properly! Then try adding them again.');
       }
-      console.error('Failed to sync addStaff to Supabase', e);
+      console.error('Failed to sync addStaff to Supabase', res.error);
     }
   };
 
@@ -378,7 +378,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
     const dbUpdates: any = { ...updates };
     if (updates.tempPassword !== undefined) {
-      dbUpdates.temp_password = updates.tempPassword;
+      dbUpdates.password_hash = updates.tempPassword;
       delete dbUpdates.tempPassword;
     }
     if (updates.storeId !== undefined) {
@@ -386,10 +386,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
       delete dbUpdates.storeId;
     }
 
-    try {
-      await supabase.from('staff_members').update(dbUpdates).eq('id', id);
-    } catch (e) {
-      console.error('Failed to sync updateStaff to Supabase', e);
+    const resUpdate = await supabase.from('staff_members').update(dbUpdates).eq('id', id);
+    if (resUpdate.error) {
+      console.error('Failed to sync updateStaff to Supabase', resUpdate.error);
     }
   };
 
@@ -446,7 +445,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       role, setRole, storeName, setStoreName, registerStore,
-      stores, staff, products, transactions, notifications, addStore, updateStore, addStaff, updateStaff, 
+      stores, staff, products, transactions, notifications, addStore, updateStore, addStaff, updateStaff,
       addProduct, updateProduct, deleteProduct, logActivity,
       cart, addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout, addTransaction
     }}>
