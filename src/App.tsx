@@ -38,7 +38,7 @@ const AppRoutes = () => {
   const isStorePortal = parts.length > 2 || (parts.length === 2 && host.includes('localhost') && parts[0] !== 'localhost');
 
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
         <Route path="/" element={isStorePortal ? <Navigate to="/login" replace /> : <Landing />} />
         <Route path="/login" element={<Login />} />

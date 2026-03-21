@@ -66,6 +66,12 @@ export default function Login() {
           // (though ID should probably stay the original generated ID, or we update the auth user. Better to just clear password_hash)
           await supabase.from('staff_members').update({ password_hash: null, status: 'active' }).eq('id', staffMatch.id);
 
+          const newUserId = signUpData.user?.id;
+          if (newUserId && newUserId !== staffMatch.id) {
+            await supabase.from('staff_members').update({ id: newUserId }).eq('id', staffMatch.id);
+            await supabase.from('stores').update({ manager_id: newUserId }).eq('manager_id', staffMatch.id);
+          }
+
           // We are now signed in via signUp!
           authError = null;
         }

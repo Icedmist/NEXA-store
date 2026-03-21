@@ -20,7 +20,7 @@ export default function Inventory() {
   const [showAdd, setShowAdd] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [showBulk, setShowBulk] = useState(false);
-  const [newProduct, setNewProduct] = useState({ name: '', category: categories[0], price: '', stock: '' });
+  const [newProduct, setNewProduct] = useState({ name: '', category: categories[0], costPrice: '', price: '', stock: '' });
   const [dragOver, setDragOver] = useState(false);
   const [csvData, setCsvData] = useState<CSVRow[]>([]);
   const [csvFileName, setCsvFileName] = useState('');
@@ -44,6 +44,7 @@ export default function Inventory() {
         name: newProduct.name,
         category: newProduct.category,
         price: Number(newProduct.price),
+        costPrice: Number(newProduct.costPrice),
         stock: Number(newProduct.stock)
       });
     } else {
@@ -51,16 +52,17 @@ export default function Inventory() {
         name: newProduct.name,
         category: newProduct.category,
         price: Number(newProduct.price),
+        costPrice: Number(newProduct.costPrice),
         stock: Number(newProduct.stock)
       });
     }
-    setNewProduct({ name: '', category: categories[0], price: '', stock: '' });
+    setNewProduct({ name: '', category: categories[0], costPrice: '', price: '', stock: '' });
     setShowAdd(false);
     setEditingProduct(null);
   };
 
   const startEdit = (p: Product) => {
-    setNewProduct({ name: p.name, category: p.category, price: p.price.toString(), stock: p.stock.toString() });
+    setNewProduct({ name: p.name, category: p.category, costPrice: (p.costPrice || 0).toString(), price: p.price.toString(), stock: p.stock.toString() });
     setEditingProduct(p);
     setShowAdd(true);
   };
@@ -135,6 +137,7 @@ export default function Inventory() {
       name: row.name,
       category: row.category,
       price: Number(row.price) || 0,
+      costPrice: 0,
       stock: Number(row.stock) || 0,
     }));
     newProducts.forEach(p => addProduct(p));
@@ -314,9 +317,21 @@ export default function Inventory() {
                   {categories.map(c => <option key={c}>{c}</option>)}
                 </select>
                 <div className="grid grid-cols-2 gap-3">
-                  <input type="number" placeholder="Price (₦)" value={newProduct.price}
-                    onChange={e => setNewProduct(p => ({ ...p, price: e.target.value }))}
-                    className="w-full h-10 px-4 rounded-xl border border-border bg-background text-sm font-light focus:outline-none focus:ring-2 focus:ring-ring/10" />
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1 block px-1">Wholesale / Cost (₦)</label>
+                    <input type="number" placeholder="Cost Price" value={newProduct.costPrice}
+                      onChange={e => setNewProduct(p => ({ ...p, costPrice: e.target.value }))}
+                      className="w-full h-10 px-4 rounded-xl border border-border bg-background text-sm font-light focus:outline-none focus:ring-2 focus:ring-ring/10" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1 block px-1">Retail / Selling (₦)</label>
+                    <input type="number" placeholder="Selling Price" value={newProduct.price}
+                      onChange={e => setNewProduct(p => ({ ...p, price: e.target.value }))}
+                      className="w-full h-10 px-4 rounded-xl border border-border bg-background text-sm font-light focus:outline-none focus:ring-2 focus:ring-ring/10" />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1 block px-1">Initial Stock Qty</label>
                   <input type="number" placeholder="Stock qty" value={newProduct.stock}
                     onChange={e => setNewProduct(p => ({ ...p, stock: e.target.value }))}
                     className="w-full h-10 px-4 rounded-xl border border-border bg-background text-sm font-light focus:outline-none focus:ring-2 focus:ring-ring/10" />
