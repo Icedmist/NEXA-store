@@ -44,7 +44,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const [storeName, setStoreName] = useState<string | null>(() => {
     const saved = localStorage.getItem('nexa-store-name');
-    return saved ? JSON.parse(saved) : 'Downtown Flagship';
+    return saved && saved !== 'null' ? JSON.parse(saved) : 'Nexa Store Portal';
   });
   const [stores, setStores] = useState<Store[]>([]);
   const [staff, setStaff] = useState<StaffMember[]>([]);
@@ -63,9 +63,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
           throw new Error('Supabase fetch failed');
         }
 
-        if (dbStores) setStores(dbStores);
-        if (dbProducts) setProducts(dbProducts);
-        if (dbStaff) setStaff(dbStaff);
+        if (dbStores) {
+          setStores(dbStores.map((s: any) => ({
+            ...s,
+            managerId: s.manager_id
+          })));
+        }
+        if (dbProducts) {
+          setProducts(dbProducts.map((p: any) => ({
+            ...p,
+            qrCode: p.qr_code,
+            lowStockThreshold: p.low_stock_threshold
+          })));
+        }
+        if (dbStaff) {
+          setStaff(dbStaff.map((s: any) => ({
+            ...s,
+            storeId: s.store_id,
+            tempPassword: s.password_hash || s.temp_password || s.tempPassword || null
+          })));
+        }
 
         const { data: dbTxns } = await supabase.from('transactions').select('*');
         if (dbTxns) {
@@ -282,7 +299,30 @@ export function AppProvider({ children }: { children: ReactNode }) {
     logActivity(`New store "${store.name}" created`, 'Admin');
 
     try {
-      await supabase.from('stores').insert([newStore]);
+      const slug = newStore.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      const dbStore = {
+        id: newStore.id,
+        name: newStore.name,
+        location: newStore.location,
+        code: newStore.code,
+        status: newStore.status,
+        revenue: newStore.revenue,
+        transactions: newStore.transactions,
+        manager_id: newStore.managerId || null,
+        slug
+      };
+
+      const storeRes = await supabase.from('stores').insert([dbStore]);
+      if (storeRes.error) {
+        if (storeRes.error.code === 'PGRST204' || storeRes.error.message.includes('slug')) {
+          console.warn('Backend schema outdated. Falling back to insert without slug.');
+          const fallbackStore = { ...dbStore };
+          delete (fallbackStore as any).slug;
+          await supabase.from('stores').insert([fallbackStore]);
+        } else {
+          throw storeRes.error;
+        }
+      }
     } catch (e) {
       console.error('Failed to sync addStore to Supabase', e);
     }
@@ -294,7 +334,20 @@ export function AppProvider({ children }: { children: ReactNode }) {
     logActivity(`Store "${store?.name}" updated`, 'Admin', id);
 
     try {
-      await supabase.from('stores').update(updates).eq('id', id);
+      const dbUpdates: any = { ...updates };
+      if (updates.managerId !== undefined) {
+        dbUpdates.manager_id = updates.managerId || null;
+        delete dbUpdates.managerId;
+      }
+      if (updates.name !== undefined) {
+        dbUpdates.slug = updates.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+      }
+
+      const res = await supabase.from('stores').update(dbUpdates).eq('id', id);
+      if (res.error && (res.error.code === 'PGRST204' || res.error.message.includes('slug'))) {
+        delete dbUpdates.slug;
+        await supabase.from('stores').update(dbUpdates).eq('id', id);
+      }
     } catch (e) {
       console.error('Failed to sync updateStore to Supabase', e);
     }
@@ -348,11 +401,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...member,
       id: `st${Date.now()}`,
       initials,
+      tempPassword: (member as any).password || member.tempPassword || null
     };
     setStaff(prev => [newMember, ...prev]);
     logActivity(`Staff member "${member.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
 
-    const res = await supabase.from('staff_members').insert([{
+    const dbStaff = {
       id: newMember.id,
       name: newMember.name,
       email: newMember.email,
@@ -361,12 +415,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       initials: newMember.initials,
       store_id: newMember.storeId,
       password_hash: newMember.tempPassword
-    }]);
+    };
+
+    const res = await supabase.from('staff_members').insert([dbStaff]);
 
     if (res.error) {
-      if (res.error.code === 'PGRST204' || res.error.message?.includes('password_hash')) {
-        alert('Supabase Cache Error! Your new manager/staff cannot securely log in yet.\n\nTo fix this:\n1. Open Supabase Dashboard -> Table Editor\n2. Open "staff_members"\n3. Click "Add Column", name it "dummy", hit Save, then delete it.\n\nThis forces Supabase to refresh its cache so passwords save properly! Then try adding them again.');
-      }
       console.error('Failed to sync addStaff to Supabase', res.error);
     }
   };

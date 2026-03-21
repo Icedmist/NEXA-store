@@ -1,11 +1,11 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Save, Users, Settings, Shield, Activity,
   MapPin, Store as StoreIcon, Trash2, Plus, Edit3,
-  Mail, Phone, Lock, ChevronRight
+  Mail, Phone, Lock, ChevronRight, Copy, Check, RefreshCw
 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -26,6 +26,18 @@ export default function BranchManagement() {
   });
 
   const [showAddStaff, setShowAddStaff] = useState(false);
+  
+  // Since useState initializers only run once, sync using useEffect
+  useEffect(() => {
+    if (currentStore) {
+      setFormData({
+        name: currentStore.name,
+        location: currentStore.location || '',
+        status: currentStore.status || 'active',
+        managerId: currentStore.managerId || ''
+      });
+    }
+  }, [currentStore]);
   const [newStaffData, setNewStaffData] = useState({
     name: '',
     role: 'staff',
@@ -33,6 +45,104 @@ export default function BranchManagement() {
     phone: '',
     password: ''
   });
+
+  const [editingStaff, setEditingStaff] = useState<any>(null);
+  const [editStaffData, setEditStaffData] = useState({
+    name: '',
+    role: 'staff',
+    email: '',
+    status: 'active',
+    password: ''
+  });
+  const [copiedPwd, setCopiedPwd] = useState(false);
+
+  const openEditStaff = (member: any) => {
+    setEditingStaff(member);
+    setEditStaffData({
+      name: member.name,
+      role: member.role,
+      email: member.email,
+      status: member.status || 'active',
+      password: ''
+    });
+  };
+
+  const generateMemorablePassword = () => {
+    const adjs = ["smart", "quick", "lucky", "happy", "brave", "bright", "cool", "calm", "fast", "wise", "kind", "soft", "warm", "gold", "silver", "blue", "red", "green", "bold", "super"];
+    const nouns = ["lion", "bear", "wolf", "hawk", "fox", "deer", "puma", "lynx", "orca", "bull", "eagle", "tiger", "shark", "whale", "owl", "crow", "duck", "swan", "seal", "koala"];
+    const acts = ["runs", "soars", "jumps", "dives", "hunts", "leaps", "speeds", "zooms", "glows", "swims", "flies", "roars", "howls", "shines", "walks", "moves", "sparks", "dances", "sings"];
+    const specials = ["!", "@", "#", "$", "%", "*", "&"];
+    
+    const adj = adjs[Math.floor(Math.random() * adjs.length)];
+    const noun = nouns[Math.floor(Math.random() * nouns.length)];
+    const act = acts[Math.floor(Math.random() * acts.length)];
+    const num = Math.floor(10 + Math.random() * 89);
+    const spec = specials[Math.floor(Math.random() * specials.length)];
+    
+    const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+    return `${cap(adj)}${cap(noun)}${cap(act)}${num}${spec}`;
+  };
+
+  const handleGeneratePassword = () => {
+    setEditStaffData(p => ({ ...p, password: generateMemorablePassword() }));
+  };
+
+  const handleGenerateLoginID = () => {
+    const rolePrefix = newStaffData.role === 'manager' ? 'manager' : 'staff';
+    const storeSlug = currentStore.name.toLowerCase().replace(/[^a-z0-9]/g, '') || 'store';
+    
+    const prefixRegex = new RegExp(`^${rolePrefix}_(\\d+)@`);
+    const existingIds = staff
+      .map(s => s.email?.match(prefixRegex))
+      .filter(Boolean)
+      .map(m => parseInt(m![1]));
+    
+    // If the input already contains a generated ID, add its index so clicking again increments it
+    const currentInputMatch = newStaffData.email?.match(prefixRegex);
+    if (currentInputMatch) {
+      existingIds.push(parseInt(currentInputMatch[1]));
+    }
+    
+    const maxId = existingIds.length > 0 ? Math.max(...existingIds) : 0;
+    const nextId = maxId + 1;
+    const paddedId = nextId.toString().padStart(2, '0');
+    
+    const baseDomain = window.location.hostname.includes('nexaos') ? 'nexaos.com' : 'nexa.com';
+    const generatedId = `${rolePrefix}_${paddedId}@${storeSlug}.${baseDomain}`;
+    
+    setNewStaffData(p => ({ ...p, email: generatedId }));
+  };
+
+  const handleGenerateNewStaffPassword = () => {
+    setNewStaffData(p => ({ ...p, password: generateMemorablePassword() }));
+  };
+
+  const handleCopyPassword = () => {
+    if (!editStaffData.password) return;
+    navigator.clipboard.writeText(editStaffData.password);
+    setCopiedPwd(true);
+    setTimeout(() => setCopiedPwd(false), 2000);
+  };
+
+  const handleUpdateStaff = () => {
+    if (!editingStaff) return;
+    const updates: any = {
+      name: editStaffData.name,
+      role: editStaffData.role,
+      email: editStaffData.email,
+      status: editStaffData.status
+    };
+    if (editStaffData.password) {
+      if (role !== 'admin') {
+        toast.error('Only admins can change passwords');
+        return;
+      }
+      updates.tempPassword = editStaffData.password;
+    }
+    updateStaff(editingStaff.id, updates);
+    toast.success(`${editStaffData.name} updated successfully`);
+    setEditingStaff(null);
+  };
 
   if (!currentStore) {
     return (
@@ -171,9 +281,11 @@ export default function BranchManagement() {
                           </span>
                         </td>
                         <td className="py-4 px-2 text-right">
-                          <button className="p-2 opacity-0 group-hover:opacity-100 hover:bg-muted rounded-lg transition-all">
-                            <Edit3 className="w-3.5 h-3.5" />
-                          </button>
+                          {member.role !== 'admin' && (
+                            <button onClick={() => openEditStaff(member)} className="p-2 opacity-0 group-hover:opacity-100 hover:bg-muted rounded-lg transition-all">
+                              <Edit3 className="w-3.5 h-3.5" />
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
@@ -274,19 +386,112 @@ export default function BranchManagement() {
                   </div>
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block px-1">Email Address</label>
-                  <input type="email" placeholder="john@example.com" value={newStaffData.email} onChange={e => setNewStaffData(p => ({ ...p, email: e.target.value }))}
+                  <div className="flex items-center justify-between mb-1.5 px-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Login ID</label>
+                    <button onClick={handleGenerateLoginID} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
+                      Auto-Generate
+                    </button>
+                  </div>
+                  <input type="email" placeholder="staff_123@nexa.com" value={newStaffData.email} onChange={e => setNewStaffData(p => ({ ...p, email: e.target.value }))}
                     className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all" />
                 </div>
                 <div>
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block px-1">Access Password</label>
-                  <input type="password" placeholder="••••••••" value={newStaffData.password} onChange={e => setNewStaffData(p => ({ ...p, password: e.target.value }))}
-                    className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all" />
+                  <div className="flex items-center justify-between mb-1.5 px-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Access Password</label>
+                    <button onClick={handleGenerateNewStaffPassword} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
+                      Auto-Generate
+                    </button>
+                  </div>
+                  <input type="text" placeholder="••••••••" value={newStaffData.password} onChange={e => setNewStaffData(p => ({ ...p, password: e.target.value }))}
+                    className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
                 </div>
 
                 <button onClick={handleAddStaffToStore} className="w-full h-12 bg-primary text-primary-foreground rounded-2xl text-sm font-medium hover:opacity-90 transition-opacity mt-2 flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
                   <Plus className="w-4 h-4" />
                   Complete Onboarding
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Edit Staff Modal Overlay */}
+        {editingStaff && (
+          <div className="fixed inset-0 bg-foreground/30 backdrop-blur-md z-50 flex items-center justify-center p-4">
+            <div className="bg-card rounded-3xl border border-border p-8 w-full max-w-lg shadow-2xl animate-scale-in">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-xl font-medium">Edit Personnel</h2>
+                  <p className="text-sm text-muted-foreground font-light mt-1">Update details for {editingStaff.name}</p>
+                </div>
+                <button onClick={() => setEditingStaff(null)} className="w-10 h-10 rounded-full border border-border flex items-center justify-center hover:bg-muted">
+                  <Plus className="w-4 h-4 rotate-45" />
+                </button>
+              </div>
+
+              <div className="space-y-5">
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block px-1">Full Name</label>
+                    <input type="text" value={editStaffData.name} onChange={e => setEditStaffData(p => ({ ...p, name: e.target.value }))}
+                      className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block px-1">Role</label>
+                    <select value={editStaffData.role} onChange={e => setEditStaffData(p => ({ ...p, role: e.target.value }))}
+                      className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all">
+                      <option value="staff">Staff Member</option>
+                      <option value="manager">Manager</option>
+                      {role === 'admin' && <option value="admin">Admin</option>}
+                    </select>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block px-1">Login ID</label>
+                    <input type="email" placeholder="staff_123@nexa.com" value={editStaffData.email} onChange={e => setEditStaffData(p => ({ ...p, email: e.target.value }))}
+                      className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all" />
+                  </div>
+                  <div>
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 block px-1">Status</label>
+                    <select value={editStaffData.status} onChange={e => setEditStaffData(p => ({ ...p, status: e.target.value }))}
+                      className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all">
+                      <option value="active">Active</option>
+                      <option value="inactive">Inactive</option>
+                    </select>
+                  </div>
+                </div>
+
+                {role === 'admin' && (
+                  <div className="p-4 rounded-2xl border border-border/50 bg-muted/10 space-y-3">
+                    <div className="flex items-center justify-between px-1">
+                      <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Password Reset</label>
+                      {editingStaff?.tempPassword && (
+                        <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1.5">
+                          Current: <code className="bg-background px-1.5 py-0.5 rounded border border-border">{editingStaff.tempPassword}</code>
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex gap-2">
+                      <input type="text" placeholder="Leave blank to keep unchanged" value={editStaffData.password} onChange={e => setEditStaffData(p => ({ ...p, password: e.target.value }))}
+                        className="flex-1 h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
+                      
+                      <button onClick={handleCopyPassword} title="Copy Password"
+                        className="w-11 h-11 rounded-xl bg-background border border-border flex items-center justify-center hover:bg-muted transition-colors shrink-0">
+                        {copiedPwd ? <Check className="w-4 h-4 text-success" /> : <Copy className="w-4 h-4 text-muted-foreground" />}
+                      </button>
+                      <button onClick={handleGeneratePassword} title="Generate Password"
+                        className="w-11 h-11 rounded-xl bg-primary/10 text-primary border border-primary/20 flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-colors shrink-0">
+                        <RefreshCw className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                <button onClick={handleUpdateStaff} className="w-full h-12 bg-primary text-primary-foreground rounded-2xl text-sm font-medium hover:opacity-90 transition-opacity mt-2 flex items-center justify-center gap-2 shadow-lg shadow-primary/20">
+                  <Save className="w-4 h-4" />
+                  Save Changes
                 </button>
               </div>
             </div>

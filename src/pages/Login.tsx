@@ -118,6 +118,14 @@ export default function Login() {
       }
 
       const userRole = staff.role;
+
+      // STRICT DOMAIN ROLE GUARDS
+      if (!portalSlug && userRole !== 'admin') {
+        // Bare domain (localhost:8080) -> ONLY Admins
+        await supabase.auth.signOut();
+        throw new Error('Access Denied: Staff and Managers must log in using their dedicated store URL.');
+      }
+
       setRole(userRole as any);
 
       // 3. Navigate based on role
