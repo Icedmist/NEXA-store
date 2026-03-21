@@ -110,10 +110,27 @@ export default function Login() {
         }
         
         // Strict mapping check for subdomain
-        // if storeData lacks slug due to old accounts, we just proceed.
-        if (portalSlug && storeData?.slug && storeData.slug !== portalSlug) {
-           await supabase.auth.signOut();
-           throw new Error(`Invalid Access: Your account does not belong to the ${portalSlug} store portal.`);
+        // We fetch the store belonging to the current visiting portal layout
+        if (portalSlug) {
+          const { data: portalStore } = await supabase
+            .from('stores')
+            .select('id, parent_store_id')
+            .eq('slug', portalSlug)
+            .single();
+
+          if (portalStore) {
+            const isOwner = portalStore.id === staff.store_id || portalStore.parent_store_id === staff.store_id;
+            if (!isOwner) {
+              await supabase.auth.signOut();
+              throw new Error(`Access Denied: Your account doesn't have privileges mapped for the ${portalSlug} store portal.`);
+            }
+          } else {
+            // Outdated slug OR no store match
+            if (storeData?.slug && storeData.slug !== portalSlug) {
+              await supabase.auth.signOut();
+              throw new Error(`Invalid Access: Your account does not belong to the ${portalSlug} store portal.`);
+            }
+          }
         }
       }
 

@@ -12,11 +12,14 @@ import { toast } from 'sonner';
 export default function BranchManagement() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { stores, updateStore, staff, updateStaff, addStaff, role, logActivity } = useApp();
+  const { stores, updateStore, deleteStore, staff, updateStaff, addStaff, role, logActivity } = useApp();
 
   const currentStore = stores.find(s => s.id === id);
   const storeStaff = staff.filter(s => s.storeId === id);
   const managers = staff.filter(s => s.role === 'manager');
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmText, setDeleteConfirmText] = useState('');
 
   const [formData, setFormData] = useState({
     name: currentStore?.name || '',
@@ -230,6 +233,19 @@ export default function BranchManagement() {
                   </div>
                 </div>
               </div>
+              
+              {role === 'admin' && (
+                <div className="mt-8 pt-6 border-t border-destructive/10">
+                  <h3 className="text-sm font-semibold text-destructive flex items-center gap-1.5">
+                    <Trash2 className="w-4 h-4" />
+                    Danger Zone
+                  </h3>
+                  <p className="text-xs text-muted-foreground mt-1 font-light">Permanently delete this branch. This action is completely irreversible and wipes all records.</p>
+                  <button onClick={() => setShowDeleteModal(true)} className="mt-4 h-10 px-4 bg-destructive/10 hover:bg-destructive text-destructive hover:text-destructive-foreground rounded-xl text-xs font-semibold transition-all">
+                    Delete Branch
+                  </button>
+                </div>
+              )}
             </section>
 
             {/* Staff Management */}
@@ -493,6 +509,46 @@ export default function BranchManagement() {
                   <Save className="w-4 h-4" />
                   Save Changes
                 </button>
+              </div>
+            </div>
+          </div>
+        )}
+        {/* Delete Confirmation Modal */}
+        {showDeleteModal && (
+          <div className="fixed inset-0 bg-foreground/20 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+            <div className="bg-card rounded-2xl border border-destructive/20 p-6 w-full max-w-sm shadow-2xl animate-scale-in">
+              <h2 className="text-base font-semibold text-destructive flex items-center gap-1.5">
+                <Trash2 className="w-4 h-4" />
+                Delete Branch?
+              </h2>
+              <p className="text-xs text-muted-foreground mt-1.5 font-light">All products, staff assignments, and records connected to <span className="font-semibold text-foreground">{currentStore.name}</span> will be permanently gone forever.</p>
+              
+              <div className="mt-5">
+                <label className="text-[10px] font-bold text-muted-foreground block mb-1.5 uppercase tracking-wider">Type <span className="text-destructive">DELETE-{currentStore.name.toUpperCase().replace(/\s+/g, '-')}</span> to verify:</label>
+                <input type="text" value={deleteConfirmText} onChange={e => setDeleteConfirmText(e.target.value)}
+                  className="w-full h-10 px-3 rounded-xl border border-destructive/20 bg-background text-sm font-light focus:outline-none focus:ring-2 focus:ring-destructive/20 transition-all font-mono" />
+                
+                <div className="flex gap-2.5 mt-4">
+                  <button onClick={() => { setShowDeleteModal(false); setDeleteConfirmText(''); }} className="flex-1 h-9 rounded-xl border border-border text-xs font-medium hover:bg-muted transition-colors">
+                    Cancel
+                  </button>
+                  <button 
+                    disabled={deleteConfirmText !== `DELETE-${currentStore.name.toUpperCase().replace(/\s+/g, '-')}`} 
+                    onClick={async () => {
+                      await deleteStore(currentStore.id);
+                      toast.success('Branch deleted successfully');
+                      navigate('/branches');
+                    }} 
+                    className={`flex-1 h-9 rounded-xl text-xs font-medium flex items-center justify-center gap-1.5 shadow-lg
+                      ${deleteConfirmText === `DELETE-${currentStore.name.toUpperCase().replace(/\s+/g, '-')}` 
+                        ? 'bg-destructive text-destructive-foreground hover:opacity-90 shadow-destructive/10' 
+                        : 'bg-muted text-muted-foreground cursor-not-allowed shadow-none'
+                      }
+                    `}
+                  >
+                    Delete Forever
+                  </button>
+                </div>
               </div>
             </div>
           </div>
