@@ -1,6 +1,6 @@
 import DashboardLayout from '@/components/layout/DashboardLayout';
 import { useApp } from '@/context/AppContext';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, Save, Users, Settings, Shield, Activity,
@@ -26,6 +26,18 @@ export default function BranchManagement() {
   });
 
   const [showAddStaff, setShowAddStaff] = useState(false);
+  
+  // Since useState initializers only run once, sync using useEffect
+  useEffect(() => {
+    if (currentStore) {
+      setFormData({
+        name: currentStore.name,
+        location: currentStore.location || '',
+        status: currentStore.status || 'active',
+        managerId: currentStore.managerId || ''
+      });
+    }
+  }, [currentStore]);
   const [newStaffData, setNewStaffData] = useState({
     name: '',
     role: 'staff',
@@ -455,7 +467,7 @@ export default function BranchManagement() {
                   <div className="p-4 rounded-2xl border border-border/50 bg-muted/10 space-y-3">
                     <div className="flex items-center justify-between px-1">
                       <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Password Reset</label>
-                      {editingStaff.tempPassword && (
+                      {editingStaff?.tempPassword && (
                         <span className="text-[10px] font-medium text-muted-foreground flex items-center gap-1.5">
                           Current: <code className="bg-background px-1.5 py-0.5 rounded border border-border">{editingStaff.tempPassword}</code>
                         </span>

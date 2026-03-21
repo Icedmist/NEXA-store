@@ -44,7 +44,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   });
   const [storeName, setStoreName] = useState<string | null>(() => {
     const saved = localStorage.getItem('nexa-store-name');
-    return saved ? JSON.parse(saved) : 'Downtown Flagship';
+    return saved && saved !== 'null' ? JSON.parse(saved) : 'Nexa Store Portal';
   });
   const [stores, setStores] = useState<Store[]>([]);
   const [staff, setStaff] = useState<StaffMember[]>([]);
@@ -401,11 +401,12 @@ export function AppProvider({ children }: { children: ReactNode }) {
       ...member,
       id: `st${Date.now()}`,
       initials,
+      tempPassword: (member as any).password || member.tempPassword || null
     };
     setStaff(prev => [newMember, ...prev]);
     logActivity(`Staff member "${member.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
 
-    const res = await supabase.from('staff_members').insert([{
+    const dbStaff = {
       id: newMember.id,
       name: newMember.name,
       email: newMember.email,
@@ -414,12 +415,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       initials: newMember.initials,
       store_id: newMember.storeId,
       password_hash: newMember.tempPassword
-    }]);
+    };
+
+    const res = await supabase.from('staff_members').insert([dbStaff]);
 
     if (res.error) {
-      if (res.error.code === 'PGRST204' || res.error.message?.includes('password_hash')) {
-        alert('Supabase Cache Error! Your new manager/staff cannot securely log in yet.\n\nTo fix this:\n1. Open Supabase Dashboard -> Table Editor\n2. Open "staff_members"\n3. Click "Add Column", name it "dummy", hit Save, then delete it.\n\nThis forces Supabase to refresh its cache so passwords save properly! Then try adding them again.');
-      }
       console.error('Failed to sync addStaff to Supabase', res.error);
     }
   };
