@@ -15,13 +15,18 @@ export default function Staff() {
     ? allStaff 
     : allStaff.filter(s => s.storeId === currentUserProfile?.storeId);
 
-  const generateCredentials = (selectedRole: string, selectedStoreId: string) => {
+  const generateMemorablePassword = () => {
+    const verbs = ['Runs', 'Jumps', 'Flies', 'Leaps', 'Swims'];
+    const adjs = ['Fast', 'Smart', 'Brave', 'Cool', 'Wild'];
+    const nouns = ['Lion', 'Tiger', 'Bear', 'Wolf', 'Puma'];
+    return `${adjs[Math.floor(Math.random() * adjs.length)]}${nouns[Math.floor(Math.random() * nouns.length)]}${verbs[Math.floor(Math.random() * verbs.length)]}${Math.floor(10 + Math.random() * 90)}!`;
+  };
+
+  const generateLoginID = (selectedRole: string, selectedStoreId: string) => {
     const slug = (stores.find(s => s.id === selectedStoreId)?.name || storeName || 'store').toLowerCase().replace(/\s+/g, '');
     const prefix = selectedRole === 'manager' ? 'mgr' : 'agent';
     const rand = Math.floor(100 + Math.random() * 900);
-    const email = `${prefix}_${rand}@${slug}.nexaos.com`;
-    const tempPassword = Math.random().toString(36).slice(-8);
-    return { email, tempPassword };
+    return `${prefix}_${rand}@${slug}.nexaos.com`;
   };
 
   const handleRoleOrStoreChange = (updates: any) => {
@@ -29,10 +34,7 @@ export default function Staff() {
     setFormData(nextState);
   };
 
-  const handleGenerateClick = () => {
-    const creds = generateCredentials(formData.role, formData.storeId);
-    setFormData(p => ({ ...p, email: creds.email, tempPassword: creds.tempPassword }));
-  };
+
 
   const handleSubmit = () => {
     if (!formData.name || !formData.email) return;
@@ -63,9 +65,9 @@ export default function Staff() {
   };
 
   const resetPassword = (member: any) => {
-    const creds = generateCredentials(member.role, member.storeId || currentUserProfile?.storeId || '');
-    updateStaff(member.id, { tempPassword: creds.tempPassword });
-    alert(`New temporary password for ${member.name} (${member.email}) is:\n\n${creds.tempPassword}\n\nPlease copy this securely. They will use this to sign in.`);
+    const newPass = generateMemorablePassword();
+    updateStaff(member.id, { tempPassword: newPass });
+    alert(`New temporary password for ${member.name} (${member.email}) is:\n\n${newPass}\n\nPlease copy this securely. They will use this to sign in.`);
   };
 
   return (
@@ -170,50 +172,25 @@ export default function Staff() {
                   </div>
                 </div>
 
-                <div className="p-4 rounded-2xl border border-border bg-muted/30">
-                  <div className="flex items-center justify-between mb-3">
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider">System Credentials</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">Auto-generated login parameters</p>
-                    </div>
-                    <button onClick={handleGenerateClick} className="text-xs font-medium text-primary hover:underline flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-lg">
-                       Regenerate
+                <div>
+                  <div className="flex items-center justify-between mb-1.5 px-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Login ID</label>
+                    <button onClick={() => setFormData(p => ({ ...p, email: generateLoginID(p.role, p.storeId) }))} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
+                      Auto-Generate
                     </button>
                   </div>
-                  
-                  {formData.email && formData.tempPassword ? (
-                    <div className="space-y-3">
-                      <div className="flex items-center justify-between bg-background border border-border p-3 rounded-xl">
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Generated ID</p>
-                          <p className="text-sm font-mono truncate select-all">{formData.email}</p>
-                        </div>
-                        <button onClick={() => { navigator.clipboard.writeText(formData.email); setCopied(true); setTimeout(() => setCopied(false), 2000); }} 
-                          className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-muted/80">
-                          {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                      <div className="flex items-center justify-between bg-background border border-border p-3 rounded-xl">
-                        <div className="min-w-0">
-                          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wider mb-1">Temporary Password</p>
-                          <p className="text-sm font-mono truncate select-all">{formData.tempPassword}</p>
-                        </div>
-                        <button onClick={() => { navigator.clipboard.writeText(formData.tempPassword); setCopied(true); setTimeout(() => setCopied(false), 2000); }} 
-                          className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:bg-muted/80">
-                          {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                        </button>
-                      </div>
-                      <p className="text-[11px] text-accent font-medium mt-2 leading-relaxed">
-                        Copy and provide these credentials to the user. They will use this to sign into {storeName || 'NexaOS'}.
-                      </p>
-                    </div>
-                  ) : (
-                    <div className="text-center py-6">
-                       <button onClick={handleGenerateClick} className="px-5 h-10 bg-primary text-primary-foreground text-sm font-medium rounded-xl hover:shadow-md transition-shadow">
-                         Generate Login Pass
-                       </button>
-                    </div>
-                  )}
+                  <input type="email" placeholder="e.g. agent_123@nexaos.com" value={formData.email} onChange={e => setFormData(p => ({ ...p, email: e.target.value }))}
+                    className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all" />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1.5 px-1">
+                    <label className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground block">Access Password</label>
+                    <button onClick={() => setFormData(p => ({ ...p, tempPassword: generateMemorablePassword() }))} className="text-[10px] font-bold uppercase tracking-wider text-primary hover:underline">
+                      Auto-Generate
+                    </button>
+                  </div>
+                  <input type="text" placeholder="••••••••" value={formData.tempPassword} onChange={e => setFormData(p => ({ ...p, tempPassword: e.target.value }))}
+                    className="w-full h-11 px-4 rounded-xl border border-border bg-background text-sm font-light focus:ring-2 focus:ring-primary/20 transition-all font-mono" />
                 </div>
 
                 <div className="pt-2">
