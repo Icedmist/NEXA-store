@@ -66,11 +66,27 @@ export function AppProvider({ children }: { children: ReactNode }) {
           return;
         }
 
-        const { data: staffProfile, error: profErr } = await supabase
+        let { data: staffProfile, error: profErr } = await supabase
           .from('staff_members')
           .select('*')
           .eq('id', user.id)
           .single();
+
+        if (!staffProfile && user.email) {
+          // Self-heal lazy-registered staff profiles (updates 'st...' fake IDs to real Auth UUID)
+          const { data: profileByEmail } = await supabase
+            .from('staff_members')
+            .select('*')
+            .eq('email', user.email)
+            .single();
+            
+          if (profileByEmail) {
+            staffProfile = profileByEmail;
+            await supabase.from('staff_members').update({ id: user.id }).eq('id', profileByEmail.id);
+            await supabase.from('stores').update({ manager_id: user.id }).eq('manager_id', profileByEmail.id);
+            staffProfile.id = user.id;
+          }
+        }
 
         let userStoreId = null;
         if (staffProfile) {
@@ -100,7 +116,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
           
           storeIds = dbStores?.map((s: any) => s.id) || [userStoreId];
 
-          const resProd = await supabase.from('products').select('*');
+          let resProd = await supabase.from('products').select('*').in('store_id', storeIds);
+          if (resProd.error) {
+            resProd = await supabase.from('products').select('*');
+          }
           dbProducts = resProd.data;
 
           const resStaff = await supabase.from('staff_members').select('*').in('store_id', storeIds);
@@ -143,7 +162,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
           setProducts(dbProducts.map((p: any) => ({
             ...p,
             qrCode: p.qr_code,
-            lowStockThreshold: p.low_stock_threshold
+            costPrice: p.cost_price || 0,
+            lowStockThreshold: p.low_stock_threshold,
+            storeId: p.store_id
           })));
         }
         if (dbStaff) {
@@ -462,13 +483,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
       id: `p${Date.now()}`,
       qrCode: `QR-${Date.now()}`,
       image: '📦',
-      lowStockThreshold: 10
+      lowStockThreshold: 10,
+      storeId: currentUserProfile?.storeId || (stores.length > 0 ? stores[0].id : undefined)
     };
     setProducts(prev => [newProduct, ...prev]);
-    logActivity(`Product "${product.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
+    logActivity(`Product "${product.name}" added`, role === 'admin' ? 'Admin' : 'Manager', newProduct.storeId);
 
     try {
-      await supabase.from('products').insert([newProduct]);
+      const dbProduct = {
+        id: newProduct.id,
+        name: newProduct.name,
+        category: newProduct.category || null,
+        price: newProduct.price,
+        cost_price: newProduct.costPrice || 0,
+        stock: newProduct.stock,
+        low_stock_threshold: newProduct.lowStockThreshold,
+        qr_code: newProduct.qrCode,
+        image: newProduct.image,
+        store_id: newProduct.storeId || null
+      };
+      await supabase.from('products').insert([dbProduct]);
     } catch (e) {
       console.error('Failed to sync addProduct to Supabase', e);
     }
@@ -480,7 +514,24 @@ export function AppProvider({ children }: { children: ReactNode }) {
     logActivity(`Product "${product?.name}" updated`, role === 'admin' ? 'Admin' : 'Manager');
 
     try {
-      await supabase.from('products').update(updates).eq('id', id);
+      const dbUpdates: any = { ...updates };
+      if (updates.lowStockThreshold !== undefined) {
+        dbUpdates.low_stock_threshold = updates.lowStockThreshold;
+        delete dbUpdates.lowStockThreshold;
+      }
+      if (updates.qrCode !== undefined) {
+        dbUpdates.qr_code = updates.qrCode;
+        delete dbUpdates.qrCode;
+      }
+      if (updates.costPrice !== undefined) {
+        dbUpdates.cost_price = updates.costPrice;
+        delete dbUpdates.costPrice;
+      }
+      if (updates.storeId !== undefined) {
+        dbUpdates.store_id = updates.storeId;
+        delete dbUpdates.storeId;
+      }
+      await supabase.from('products').update(dbUpdates).eq('id', id);
     } catch (e) {
       console.error('Failed to sync updateProduct to Supabase', e);
     }

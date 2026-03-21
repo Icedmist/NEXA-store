@@ -16,10 +16,12 @@ export interface Product {
   name: string;
   category: string;
   price: number;
+  costPrice: number;
   stock: number;
   lowStockThreshold: number;
   qrCode: string;
   image: string;
+  storeId?: string;
 }
 
 export interface StaffMember {

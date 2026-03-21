@@ -14,3 +14,9 @@ WHERE activities.store = stores.name AND activities.store_id IS NULL;
 
 -- 4. Add store_id to transactions to prevent cross-store access leaks, just to be safe.
 ALTER TABLE transactions ADD COLUMN IF NOT EXISTS store_id TEXT REFERENCES stores(id) ON DELETE SET NULL;
+
+-- 5. Add store_id to products to tightly scope them to respective stores to prevent cross-viewing.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS store_id TEXT REFERENCES stores(id) ON DELETE SET NULL;
+
+-- 6. Add cost_price to products for tracking wholesale/profit margins.
+ALTER TABLE products ADD COLUMN IF NOT EXISTS cost_price NUMERIC DEFAULT 0;

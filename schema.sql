@@ -23,10 +23,12 @@ CREATE TABLE IF NOT EXISTS products (
   name TEXT NOT NULL,
   category TEXT,
   price NUMERIC NOT NULL,
+  cost_price NUMERIC DEFAULT 0,
   stock INT NOT NULL,
   low_stock_threshold INT DEFAULT 10,
   qr_code TEXT UNIQUE,
-  image TEXT
+  image TEXT,
+  store_id TEXT REFERENCES stores(id) ON DELETE SET NULL
 );
 
 -- Staff Members (Can be profiles referencing auth.users in production)
