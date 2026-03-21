@@ -8,12 +8,14 @@ interface AppContextType {
   storeName: string | null;
   stores: Store[];
   staff: StaffMember[];
+  currentUserProfile: StaffMember | null;
   transactions: Transaction[];
   notifications: any[];
   setStoreName: (name: string | null) => void;
   registerStore: (name: string, email: string, password?: string) => Promise<void>;
   addStore: (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => Promise<void>;
   updateStore: (id: string, updates: Partial<Store>) => Promise<void>;
+  deleteStore: (id: string) => Promise<void>;
   products: Product[];
   addProduct: (product: Omit<Product, 'id' | 'qrCode' | 'image' | 'lowStockThreshold'>) => Promise<void>;
   updateProduct: (id: string, updates: Partial<Product>) => Promise<void>;
@@ -21,6 +23,7 @@ interface AppContextType {
   addStaff: (member: Omit<StaffMember, 'id' | 'initials'>) => Promise<void>;
   updateStaff: (id: string, updates: Partial<StaffMember>) => Promise<void>;
   logActivity: (action: string, user: string, storeId?: string) => void;
+  loading: boolean;
   addToCart: (product: Product) => void;
   removeFromCart: (productId: string) => void;
   updateCartQty: (productId: string, qty: number) => void;
@@ -51,20 +54,87 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [currentUserProfile, setCurrentUserProfile] = useState<StaffMember | null>(null);
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        const { data: dbStores, error: storesErr } = await supabase.from('stores').select('*');
-        const { data: dbProducts, error: prodErr } = await supabase.from('products').select('*');
-        const { data: dbStaff, error: staffErr } = await supabase.from('staff_members').select('*');
-
-        if (storesErr || prodErr || staffErr) {
-          throw new Error('Supabase fetch failed');
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) {
+          setLoading(false);
+          return;
         }
 
-        if (dbStores) {
-          setStores(dbStores.map((s: any) => ({
+        const { data: staffProfile, error: profErr } = await supabase
+          .from('staff_members')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+
+        let userStoreId = null;
+        if (staffProfile) {
+          userStoreId = staffProfile.store_id;
+          setCurrentUserProfile({
+            ...staffProfile,
+            storeId: staffProfile.store_id,
+            tempPassword: staffProfile.password_hash || staffProfile.temp_password || staffProfile.tempPassword || null
+          });
+        }
+
+        let dbStores: any[] | null = null;
+        let dbProducts: any[] | null = null;
+        let dbStaff: any[] | null = null;
+        let storesErr: any = null;
+        let storeIds: string[] = [];
+
+        if (userStoreId) {
+          // Fetch stores owned by this store (children Branches) OR is the store itself
+          const resStores = await supabase
+            .from('stores')
+            .select('*')
+            .or(`id.eq.${userStoreId},parent_store_id.eq.${userStoreId}`);
+          
+          dbStores = resStores.data;
+          storesErr = resStores.error;
+          
+          storeIds = dbStores?.map((s: any) => s.id) || [userStoreId];
+
+          const resProd = await supabase.from('products').select('*');
+          dbProducts = resProd.data;
+
+          const resStaff = await supabase.from('staff_members').select('*').in('store_id', storeIds);
+          dbStaff = resStaff.data;
+        } else {
+          console.warn('No mapped store_id found for current auth user. Loading broad view dashboard.');
+          const resStores = await supabase.from('stores').select('*');
+          dbStores = resStores.data;
+          
+          if (dbStores) storeIds = dbStores.map((s: any) => s.id);
+
+          const resProd = await supabase.from('products').select('*');
+          dbProducts = resProd.data;
+
+          const resStaff = await supabase.from('staff_members').select('*');
+          dbStaff = resStaff.data;
+        }
+
+        if (storesErr && userStoreId) {
+          console.warn('Backend schema doesn\'t have parent_store_id. Falling back to simple fetch.');
+        }
+
+        // Fetch stores again with simple query fallback if it originally errored or list was empty
+        let finalStores = dbStores || [];
+        if (userStoreId && (storesErr || finalStores.length === 0)) {
+          const { data: fbStores } = await supabase.from('stores').select('*').eq('id', userStoreId);
+          if (fbStores) {
+            finalStores = fbStores;
+            storeIds = finalStores.map((s: any) => s.id);
+          }
+        }
+
+        if (finalStores.length > 0) {
+          setStores(finalStores.map((s: any) => ({
             ...s,
             managerId: s.manager_id
           })));
@@ -93,7 +163,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
           })));
         }
 
-        const { data: dbNotifs } = await supabase.from('activities').select('*').order('time', { ascending: false });
+        let dbNotifsRes = await supabase.from('activities').select('*').in('store_id', storeIds).order('time', { ascending: false });
+        if (dbNotifsRes.error) {
+           dbNotifsRes = await supabase.from('activities').select('*').order('time', { ascending: false });
+        }
+        const dbNotifs = dbNotifsRes.data;
         if (dbNotifs) {
           setNotifications(dbNotifs.map((n: any) => ({
             id: n.id,
@@ -110,6 +184,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         setStores([]);
         setProducts([]);
         setStaff([]);
+      } finally {
+        setLoading(false);
       }
     };
     loadData();
@@ -170,7 +246,9 @@ export function AppProvider({ children }: { children: ReactNode }) {
 
   const logout = useCallback(() => {
     setRole(null);
+    setCurrentUserProfile(null);
     clearCart();
+    supabase.auth.signOut();
   }, [clearCart]);
 
   const registerStore = async (name: string, email: string, password?: string) => {
@@ -279,6 +357,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setStaff(prev => [newStaff, ...prev]);
       setStoreName(name);
       setRole('admin');
+      setCurrentUserProfile(newStaff);
 
     } catch (e) {
       console.error('Failed to register store in Supabase', e);
@@ -299,6 +378,13 @@ export function AppProvider({ children }: { children: ReactNode }) {
     logActivity(`New store "${store.name}" created`, 'Admin');
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      let currentAdminStoreId = null;
+      if (user) {
+        const { data: staffProfile } = await supabase.from('staff_members').select('store_id').eq('id', user.id).single();
+        if (staffProfile) currentAdminStoreId = staffProfile.store_id;
+      }
+
       const slug = newStore.name.toLowerCase().replace(/[^a-z0-9]/g, '');
       const dbStore = {
         id: newStore.id,
@@ -309,7 +395,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
         revenue: newStore.revenue,
         transactions: newStore.transactions,
         manager_id: newStore.managerId || null,
-        slug
+        slug,
+        parent_store_id: currentAdminStoreId
       };
 
       const storeRes = await supabase.from('stores').insert([dbStore]);
@@ -318,6 +405,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
           console.warn('Backend schema outdated. Falling back to insert without slug.');
           const fallbackStore = { ...dbStore };
           delete (fallbackStore as any).slug;
+          delete (fallbackStore as any).parent_store_id;
           await supabase.from('stores').insert([fallbackStore]);
         } else {
           throw storeRes.error;
@@ -350,6 +438,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
       }
     } catch (e) {
       console.error('Failed to sync updateStore to Supabase', e);
+    }
+  };
+
+  const deleteStore = async (id: string) => {
+    const store = stores.find(s => s.id === id);
+    setStores(prev => prev.filter(s => s.id !== id));
+    logActivity(`Store "${store?.name}" deleted`, 'Admin', id);
+
+    try {
+      // 1. Delete associated staff
+      await supabase.from('staff_members').delete().eq('store_id', id);
+      // 2. Delete the store
+      await supabase.from('stores').delete().eq('id', id);
+    } catch (e) {
+      console.error('Failed to sync deleteStore to Supabase', e);
     }
   };
 
@@ -404,7 +507,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       tempPassword: (member as any).password || member.tempPassword || null
     };
     setStaff(prev => [newMember, ...prev]);
-    logActivity(`Staff member "${member.name}" added`, role === 'admin' ? 'Admin' : 'Manager');
+    logActivity(`Staff member "${member.name}" added`, role === 'admin' ? 'Admin' : 'Manager', newMember.storeId);
 
     const dbStaff = {
       id: newMember.id,
@@ -445,8 +548,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const logActivity = (action: string, user: string, storeId?: string) => {
-    const store = stores.find(s => s.id === storeId);
+  const logActivity = (action: string, user: string, targetStoreId?: string) => {
+    const finalStoreId = targetStoreId || (currentUserProfile ? currentUserProfile.storeId : (stores.length > 0 ? stores[0].id : null));
+    const store = stores.find(s => s.id === finalStoreId);
+    
     const activity = {
       id: `notif-${Date.now()}`,
       action,
@@ -461,6 +566,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
       action: activity.action,
       user_name: activity.user,
       store: activity.store,
+      store_id: finalStoreId,
       type: 'system'
     }]).then(({ error }) => {
       if (error) console.error(error);
@@ -498,8 +604,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   return (
     <AppContext.Provider value={{
       role, setRole, storeName, setStoreName, registerStore,
-      stores, staff, products, transactions, notifications, addStore, updateStore, addStaff, updateStaff,
-      addProduct, updateProduct, deleteProduct, logActivity,
+      stores, staff, products, transactions, notifications, addStore, updateStore, deleteStore, addStaff, updateStaff,
+      addProduct, updateProduct, deleteProduct, logActivity, loading, currentUserProfile,
       cart, addToCart, removeFromCart, updateCartQty, clearCart, cartTotal, cartCount, logout, addTransaction
     }}>
       {children}

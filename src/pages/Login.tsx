@@ -90,13 +90,13 @@ export default function Login() {
         let storeData = null;
         const resStore = await supabase
           .from('stores')
-          .select('name, slug')
+          .select('name, slug, parent_store_id')
           .eq('id', staff.store_id)
           .single();
           
         if (resStore.error) {
           if (resStore.error.code === 'PGRST204' || resStore.error.message.includes('slug')) {
-             const fbStore = await supabase.from('stores').select('name').eq('id', staff.store_id).single();
+             const fbStore = await supabase.from('stores').select('name, parent_store_id').eq('id', staff.store_id).single();
              storeData = fbStore.data;
           } else {
              throw resStore.error;
@@ -110,10 +110,39 @@ export default function Login() {
         }
         
         // Strict mapping check for subdomain
-        // if storeData lacks slug due to old accounts, we just proceed.
-        if (portalSlug && storeData?.slug && storeData.slug !== portalSlug) {
-           await supabase.auth.signOut();
-           throw new Error(`Invalid Access: Your account does not belong to the ${portalSlug} store portal.`);
+        // We fetch the store belonging to the current visiting portal layout
+        if (portalSlug) {
+          const { data: portalStore } = await supabase
+            .from('stores')
+            .select('id, parent_store_id')
+            .eq('slug', portalSlug)
+            .single();
+
+          if (portalStore) {
+            // 2-way Hierarchical Check:
+            // 1. Visit matches your store (portalStore.id === staff.store_id)
+            // 2. Visiting node is a branch of your store (portalStore.parent_store_id === staff.store_id)
+            // 3. Your store node is a branch belonging to the visiting base (storeData?.parent_store_id === portalStore.id)
+            
+            const staffParentId = (storeData as any)?.parent_store_id;
+            const isOwner = portalStore.id === staff.store_id || 
+                            portalStore.parent_store_id === staff.store_id ||
+                            (staffParentId && staffParentId === portalStore.id);
+
+            if (!isOwner) {
+              await supabase.auth.signOut();
+              throw new Error(`Access Denied: Your account doesn't have privileges mapped for the ${portalSlug} store portal.`);
+            }
+          } else {
+            // Fallback for missing Slug schemas on old database records
+            const matches = storeData?.slug === portalSlug || 
+                            storeData?.name?.toLowerCase().replace(/\s+/g, '') === portalSlug;
+
+            if (storeData && !matches) {
+              await supabase.auth.signOut();
+              throw new Error(`Invalid Access: Your account does not belong to the ${portalSlug} store portal.`);
+            }
+          }
         }
       }
 

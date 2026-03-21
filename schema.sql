@@ -13,7 +13,8 @@ CREATE TABLE IF NOT EXISTS stores (
   revenue NUMERIC DEFAULT 0,
   transactions INT DEFAULT 0,
   manager_id TEXT,
-  slug TEXT UNIQUE
+  slug TEXT UNIQUE,
+  parent_store_id TEXT REFERENCES stores(id) ON DELETE SET NULL
 );
 
 -- Products
@@ -47,7 +48,8 @@ CREATE TABLE IF NOT EXISTS transactions (
   total NUMERIC NOT NULL,
   payment_method TEXT CHECK (payment_method IN ('cash', 'card', 'mobile')),
   timestamp TIMESTAMPTZ DEFAULT NOW(),
-  cashier TEXT
+  cashier TEXT,
+  store_id TEXT REFERENCES stores(id) ON DELETE SET NULL
 );
 
 -- Activities / Notifications
@@ -57,6 +59,7 @@ CREATE TABLE IF NOT EXISTS activities (
   action TEXT NOT NULL,
   user_name TEXT,
   time TIMESTAMPTZ DEFAULT NOW(),
-  type TEXT
+  type TEXT,
+  store_id TEXT REFERENCES stores(id) ON DELETE SET NULL
 );
 

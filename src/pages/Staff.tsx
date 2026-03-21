@@ -4,18 +4,16 @@ import { useState } from 'react';
 import { Plus, X, UserCheck, UserX, Edit2, KeyRound, Copy, Check } from 'lucide-react';
 
 export default function Staff() {
-  const { staff: allStaff, stores, addStaff, updateStaff, role, staff: currentStaffMembers, storeName } = useApp();
+  const { staff: allStaff, stores, addStaff, updateStaff, role, currentUserProfile, storeName } = useApp();
   const [showAdd, setShowAdd] = useState(false);
   const [editingStaff, setEditingStaff] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', role: 'staff' as 'staff' | 'manager', storeId: '', tempPassword: '' });
 
   // Filter staff based on role and branch assignments
-  const currentUser = allStaff.find(s => s.role === role); // simplification
-  
   const staffList = role === 'admin' 
     ? allStaff 
-    : allStaff.filter(s => s.storeId === currentUser?.storeId);
+    : allStaff.filter(s => s.storeId === currentUserProfile?.storeId);
 
   const generateCredentials = (selectedRole: string, selectedStoreId: string) => {
     const slug = (stores.find(s => s.id === selectedStoreId)?.name || storeName || 'store').toLowerCase().replace(/\s+/g, '');
@@ -65,7 +63,7 @@ export default function Staff() {
   };
 
   const resetPassword = (member: any) => {
-    const creds = generateCredentials(member.role, member.storeId || '');
+    const creds = generateCredentials(member.role, member.storeId || currentUserProfile?.storeId || '');
     updateStaff(member.id, { tempPassword: creds.tempPassword });
     alert(`New temporary password for ${member.name} (${member.email}) is:\n\n${creds.tempPassword}\n\nPlease copy this securely. They will use this to sign in.`);
   };
@@ -81,7 +79,7 @@ export default function Staff() {
             </p>
           </div>
           <button onClick={() => {
-            setFormData({ name: '', email: '', role: 'staff', storeId: '', tempPassword: '' });
+            setFormData({ name: '', email: '', role: 'staff', storeId: role === 'admin' ? '' : (currentUserProfile?.storeId || ''), tempPassword: '' });
             setEditingStaff(null);
             setShowAdd(true);
           }}

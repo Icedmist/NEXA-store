@@ -4,7 +4,8 @@ import {
   LayoutDashboard, Package, Users, Settings,
   Calculator, ScanLine, Printer, Receipt, Store, LogOut, Wifi, WifiOff
 } from 'lucide-react';
-import { useState } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useState, useEffect } from 'react';
 import { ModeToggle } from '@/components/ModeToggle';
 
 const navItems = {
@@ -28,10 +29,24 @@ const navItems = {
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { role, storeName, logout, cartCount } = useApp();
+  const { role, storeName, logout, cartCount, currentUserProfile, loading } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
   const [isOnline] = useState(true);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
+
+  const currentProfile = currentUserProfile;
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <div className="w-10 h-10 border-2 border-primary/20 border-t-primary rounded-full animate-spin"></div>
+          <p className="text-xs text-muted-foreground font-light tracking-wider animate-pulse">Loading Workspace...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!role) return null;
 
@@ -58,7 +73,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
             <ModeToggle />
           </div>
           <button
-            onClick={() => { logout(); navigate('/'); }}
+            onClick={() => setShowLogoutConfirm(true)}
             className="group p-2 rounded-xl text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all active:scale-90"
             title="Sign out"
           >
@@ -66,6 +81,25 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </button>
         </div>
       </header>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="fixed inset-0 bg-foreground/20 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+          <div className="bg-card rounded-2xl border border-border p-6 w-full max-w-xs shadow-2xl animate-scale-in text-center">
+            <h3 className="text-base font-semibold text-foreground">Sign Out</h3>
+            <p className="text-xs text-muted-foreground mt-1.5 font-light">Are you sure you want to end your session?</p>
+            <div className="flex gap-2.5 mt-5">
+              <button onClick={() => setShowLogoutConfirm(false)} className="flex-1 h-9 rounded-xl border border-border text-xs font-medium hover:bg-muted transition-colors">
+                Cancel
+              </button>
+              <button onClick={() => { logout(); navigate('/'); }} className="flex-1 h-9 rounded-xl bg-destructive text-destructive-foreground text-xs font-medium hover:opacity-90 transition-opacity flex items-center justify-center gap-1.5 shadow-lg shadow-destructive/10">
+                <LogOut className="w-3.5 h-3.5" />
+                Sign Out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Page Content */}
       <main className="flex-1 p-4 lg:p-8 lg:ml-64 pb-24 lg:pb-8 animate-fade-in">
@@ -105,7 +139,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="mt-auto px-2">
             <div className="p-4 bg-primary/5 rounded-2xl border border-primary/10">
               <p className="text-[11px] font-bold text-primary uppercase tracking-tighter">Current Session</p>
-              <p className="text-xs text-muted-foreground mt-1 truncate">Role: <span className="text-foreground capitalize">{role}</span></p>
+              {currentProfile ? (
+                <div className="mt-1.5 space-y-0.5">
+                  <p className="text-sm font-semibold text-foreground truncate">{currentProfile.name}</p>
+                  <p className="text-[10px] text-muted-foreground truncate">{currentProfile.email}</p>
+                  <p className="text-[9px] font-bold text-primary/80 uppercase tracking-widest pt-1">{role} Mode</p>
+                </div>
+              ) : (
+                <p className="text-xs text-muted-foreground mt-1 truncate">Role: <span className="text-foreground capitalize">{role}</span></p>
+              )}
             </div>
           </div>
         </div>
