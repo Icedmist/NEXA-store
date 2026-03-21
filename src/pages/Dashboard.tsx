@@ -28,32 +28,7 @@ function StatCard({ label, value, change, positive, icon: Icon, delay }: {
     </div>
   );
 }
-function ActivityItem({ activity }: { activity: typeof mockActivities[0] }) {
-  const icons = {
-    staff: Users,
-    inventory: Package,
-    system: Bell,
-    registration: ClipboardList,
-  };
-  const Icon = icons[activity.type as keyof typeof icons] || Bell;
-  
-  return (
-    <div className="flex items-start gap-4 py-3 border-b border-border last:border-0">
-      <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center flex-shrink-0">
-        <Icon className="w-4 h-4 text-muted-foreground" />
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="flex justify-between items-start">
-          <p className="text-sm font-medium truncate">{activity.action}</p>
-          <span className="text-[10px] text-muted-foreground whitespace-nowrap ml-2">{activity.time}</span>
-        </div>
-        <p className="text-[11px] text-muted-foreground">
-          {activity.store} • {activity.user}
-        </p>
-      </div>
-    </div>
-  );
-}
+
 
 function PnLChart({ data }: { data: any[] }) {
   return (
