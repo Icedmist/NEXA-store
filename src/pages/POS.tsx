@@ -17,7 +17,7 @@ export default function POS() {
   const filtered = Array.isArray(allProducts) ? allProducts.filter(p => p?.name?.toLowerCase().includes(search.toLowerCase())) : [];
 
   const handleCheckout = async () => {
-    await addTransaction(paymentMethod, 'Cashier');
+    await addTransaction(paymentMethod, appCtx.currentUserProfile?.name || 'Cashier');
     setReceiptId(`RCP-${Date.now().toString().slice(-6)}`);
     setShowReceipt(true);
     setShowCheckout(false);
