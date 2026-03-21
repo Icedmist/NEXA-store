@@ -29,20 +29,13 @@ const navItems = {
 };
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { role, storeName, logout, cartCount, staff, loading } = useApp();
+  const { role, storeName, logout, cartCount, currentUserProfile, loading } = useApp();
   const navigate = useNavigate();
   const location = useLocation();
   const [isOnline] = useState(true);
-  const [userEmail, setUserEmail] = useState<string | null>(null);
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data?.user) setUserEmail(data.user.email || null);
-    });
-  }, []);
-
-  const currentProfile = staff.find(s => s.email === userEmail);
+  const currentProfile = currentUserProfile;
 
   if (loading) {
     return (

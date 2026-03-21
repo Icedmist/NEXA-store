@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 export default function BranchManagement() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { stores, updateStore, deleteStore, staff, updateStaff, addStaff, role, logActivity } = useApp();
+  const { stores, updateStore, deleteStore, staff, updateStaff, addStaff, role, logActivity, storeName } = useApp();
 
   const currentStore = stores.find(s => s.id === id);
   const storeStaff = staff.filter(s => s.storeId === id);
@@ -92,7 +92,9 @@ export default function BranchManagement() {
 
   const handleGenerateLoginID = () => {
     const rolePrefix = newStaffData.role === 'manager' ? 'manager' : 'staff';
-    const storeSlug = currentStore.name.toLowerCase().replace(/[^a-z0-9]/g, '') || 'store';
+    
+    // Smoothly read off the currently active storefront workspace header title
+    const storeSlug = storeName ? storeName.toLowerCase().replace(/[^a-z0-9]/g, '') : 'store';
     
     const prefixRegex = new RegExp(`^${rolePrefix}_(\\d+)@`);
     const existingIds = staff
