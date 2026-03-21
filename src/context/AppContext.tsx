@@ -63,9 +63,26 @@ export function AppProvider({ children }: { children: ReactNode }) {
           throw new Error('Supabase fetch failed');
         }
 
-        if (dbStores) setStores(dbStores);
-        if (dbProducts) setProducts(dbProducts);
-        if (dbStaff) setStaff(dbStaff);
+        if (dbStores) {
+          setStores(dbStores.map((s: any) => ({
+            ...s,
+            managerId: s.manager_id
+          })));
+        }
+        if (dbProducts) {
+          setProducts(dbProducts.map((p: any) => ({
+            ...p,
+            qrCode: p.qr_code,
+            lowStockThreshold: p.low_stock_threshold
+          })));
+        }
+        if (dbStaff) {
+          setStaff(dbStaff.map((s: any) => ({
+            ...s,
+            storeId: s.store_id,
+            tempPassword: s.password_hash || s.temp_password || s.tempPassword || null
+          })));
+        }
 
         const { data: dbTxns } = await supabase.from('transactions').select('*');
         if (dbTxns) {
