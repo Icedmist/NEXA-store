@@ -97,7 +97,17 @@ export function AppProvider({ children }: { children: ReactNode }) {
             tempPassword: staffProfile.password_hash || staffProfile.temp_password || staffProfile.tempPassword || null
           });
         }
-
+        if (!userStoreId && typeof window !== 'undefined') {
+          const host = window.location.hostname;
+          const parts = host.split('.');
+          if (parts.length > 2 && parts[0] !== 'www' && parts[0] !== 'localhost') {
+            const { data: matchedStores } = await supabase.from('stores').select('*');
+            const matched = matchedStores?.find((s: any) => s.name.toLowerCase().replace(/\s+/g, '') === parts[0].toLowerCase());
+            if (matched) {
+              userStoreId = matched.id;
+            }
+          }
+        }
         let dbStores: any[] | null = null;
         let dbProducts: any[] | null = null;
         let dbStaff: any[] | null = null;

@@ -84,7 +84,7 @@ function AdminDashboardContent() {
               const product = products.find(p => p.name === item.name);
               return itemSum + (item.qty * (product?.costPrice || 0));
           }, 0);
-      }, 0) + (moTxns.length > 0 ? 50000 : 0); // Add fake overhead footprint dynamically
+      }, 0);
 
       return { month: d.toLocaleDateString('en-US', { month: 'short' }), revenue, expenses, profit: revenue - expenses };
   });
