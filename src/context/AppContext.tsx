@@ -117,9 +117,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
           storeIds = dbStores?.map((s: any) => s.id) || [userStoreId];
 
           let resProd = await supabase.from('products').select('*').in('store_id', storeIds);
-          if (resProd.error) {
-            resProd = await supabase.from('products').select('*');
-          }
           dbProducts = resProd.data;
 
           const resStaff = await supabase.from('staff_members').select('*').in('store_id', storeIds);
@@ -175,8 +172,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
           })));
         }
 
-        const { data: dbTxns } = await supabase.from('transactions').select('*');
-        if (dbTxns) {
+          let resTxns = await supabase.from('transactions').select('*').in('store_id', storeIds);
+          const dbTxns = resTxns.data;
+          
+          if (dbTxns) {
           setTransactions(dbTxns.map((t: any) => ({
             ...t,
             paymentMethod: t.payment_method,
@@ -185,9 +184,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
         }
 
         let dbNotifsRes = await supabase.from('activities').select('*').in('store_id', storeIds).order('time', { ascending: false });
-        if (dbNotifsRes.error) {
-           dbNotifsRes = await supabase.from('activities').select('*').order('time', { ascending: false });
-        }
         const dbNotifs = dbNotifsRes.data;
         if (dbNotifs) {
           setNotifications(dbNotifs.map((n: any) => ({
@@ -645,7 +641,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
         payment_method: newTxn.paymentMethod,
         cashier: newTxn.cashier,
         timestamp: newTxn.timestamp,
-        store_id: storeId || null
+        store_id: storeId || currentUserProfile?.storeId || null
       }]);
     } catch (e) {
       console.error('Failed to sync transaction to Supabase', e);
