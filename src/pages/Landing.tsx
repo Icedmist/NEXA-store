@@ -273,8 +273,8 @@ export default function LandingPage() {
                       </div>
                       <h4 className="text-xs font-semibold text-[#8C8F93] uppercase font-sans">Outage Resilience</h4>
                     </div>
-                    <h3 className="text-lg font-semibold font-sans tracking-tight text-[#E4E4E5]">Offline Sync Streams</h3>
-                    <p className="text-sm text-[#9BA1A6] font-normal">Transitions sync automatically right after established links.</p>
+                    <h3 className="text-lg font-semibold font-sans tracking-tight text-[#E4E4E5]">Auto-Sync Engine</h3>
+                    <p className="text-sm text-[#9BA1A6] font-normal">Transactions queue locally and sync automatically once reconnected.</p>
                   </div>
                   <div className="flex-1 rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
                     <img src={heroImages[2]} alt="Queue" className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" />
@@ -315,8 +315,8 @@ export default function LandingPage() {
                 <HatchedSide />
                 <div className="flex-1 px-0 sm:px-2 md:px-0 flex flex-col md:flex-row justify-center items-stretch gap-0">
                   <FeatureCard
-                    title="Works offline"
-                    description="Sell and scan without internet. Transactions sync automatically to the cloud once reconnected."
+                    title="Always-on selling"
+                    description="Keep ringing up sales no matter what. Transactions queue locally and sync to the cloud the moment you're back online."
                     isActive={activeCard === 0}
                     progress={activeCard === 0 ? progress : 0}
                     onClick={() => handleCardClick(0)}
@@ -486,10 +486,10 @@ export default function LandingPage() {
                     <div className="border-r-0 md:border-r border-[rgba(55,50,47,0.12)] dark:border-white/5 p-4 sm:p-6 md:p-8 lg:p-12 flex flex-col justify-start items-start gap-4 sm:gap-6 bg-transparent">
                       <div className="flex flex-col gap-2">
                         <h3 className="text-[#37322F] dark:text-white text-lg sm:text-xl font-semibold leading-tight font-sans">
-                          Offline-First Syncing
+                          Seamless Syncing
                         </h3>
                         <p className="text-[#605A57] dark:text-gray-400 text-sm md:text-base font-normal leading-relaxed font-sans">
-                          Transactions save locally in a secure silo and stream automatically to your master dashboard as soon as you are reconnected.
+                          Transactions save locally and stream automatically to your master dashboard as soon as connectivity returns.
                         </p>
                       </div>
                       <div className="w-full h-[200px] sm:h-[250px] md:h-[300px] rounded-lg flex overflow-hidden justify-center items-center relative bg-transparent">

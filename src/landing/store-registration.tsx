@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Store, Mail, Lock, ShieldCheck, Loader2 } from 'lucide-react';
+import { ArrowRight, Store, Mail, Lock, ShieldCheck, Loader2, User, Phone, MapPin, FileText } from 'lucide-react';
 import { useApp } from '@/context/AppContext';
 
 export default function StoreRegistrationSection() {
@@ -9,15 +9,24 @@ export default function StoreRegistrationSection() {
   const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
+    ownerName: '',
     email: '',
-    password: ''
+    phone: '',
+    password: '',
+    address: '',
+    description: ''
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await registerStore(formData.name, formData.email, formData.password);
+      await registerStore(formData.name, formData.email, formData.password, {
+        ownerName: formData.ownerName,
+        phone: formData.phone,
+        address: formData.address,
+        description: formData.description
+      });
       navigate('/dashboard');
     } catch (error) {
       console.error(error);
@@ -47,7 +56,7 @@ export default function StoreRegistrationSection() {
             </h2>
             
             <p className="text-lg text-[#605A57] dark:text-gray-400 leading-relaxed">
-              Join thousands of retailers who trust Nexa to run their operations offline and online. Register your store today and get full access to our multi-store dashboard and QR inventory system.
+              Join thousands of retailers who trust Nexa to run their operations. Register your store today and get full access to our multi-store dashboard and QR inventory system.
             </p>
             
             <div className="flex flex-col gap-4 mt-4">
@@ -55,7 +64,7 @@ export default function StoreRegistrationSection() {
                 "Instant store setup in under 2 minutes",
                 "Unlimited staff accounts and role management",
                 "Advanced QR inventory synchronization",
-                "Works 100% offline with auto-sync"
+                "Real-time analytics and reporting"
               ].map((item, i) => (
                 <div key={i} className="flex items-center gap-3">
                   <div className="w-5 h-5 rounded-full bg-accent/10 flex items-center justify-center flex-shrink-0">
@@ -78,7 +87,41 @@ export default function StoreRegistrationSection() {
                 <p className="text-sm text-[#605A57] dark:text-gray-400 mt-1">Free 14-day trial, no credit card required.</p>
               </div>
 
-              <form className="space-y-5" onSubmit={handleSubmit}>
+              <form className="space-y-4" onSubmit={handleSubmit}>
+                {/* Row: Owner Name + Phone */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-[#605A57] dark:text-gray-500 ml-1">Owner Name</label>
+                    <div className="relative group">
+                      <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#605A57] dark:text-gray-500 group-focus-within:text-accent transition-colors" />
+                      <input 
+                        type="text" 
+                        placeholder="John Doe" 
+                        value={formData.ownerName}
+                        onChange={(e) => setFormData({ ...formData, ownerName: e.target.value })}
+                        className="w-full h-12 pl-11 pr-4 bg-white/50 dark:bg-white/5 border border-[rgba(55,50,47,0.12)] dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs font-bold uppercase tracking-widest text-[#605A57] dark:text-gray-500 ml-1">Phone Number</label>
+                    <div className="relative group">
+                      <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#605A57] dark:text-gray-500 group-focus-within:text-accent transition-colors" />
+                      <input 
+                        type="tel" 
+                        placeholder="+234 800 000 0000" 
+                        value={formData.phone}
+                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                        className="w-full h-12 pl-11 pr-4 bg-white/50 dark:bg-white/5 border border-[rgba(55,50,47,0.12)] dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium"
+                        required
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Store Name */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-[#605A57] dark:text-gray-500 ml-1">Store Name</label>
                   <div className="relative group">
@@ -94,6 +137,37 @@ export default function StoreRegistrationSection() {
                   </div>
                 </div>
 
+                {/* Store Address */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-[#605A57] dark:text-gray-500 ml-1">Store Address</label>
+                  <div className="relative group">
+                    <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#605A57] dark:text-gray-500 group-focus-within:text-accent transition-colors" />
+                    <input 
+                      type="text" 
+                      placeholder="123 Market Street, Lagos" 
+                      value={formData.address}
+                      onChange={(e) => setFormData({ ...formData, address: e.target.value })}
+                      className="w-full h-12 pl-11 pr-4 bg-white/50 dark:bg-white/5 border border-[rgba(55,50,47,0.12)] dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Store Description */}
+                <div className="space-y-2">
+                  <label className="text-xs font-bold uppercase tracking-widest text-[#605A57] dark:text-gray-500 ml-1">Store Description</label>
+                  <div className="relative group">
+                    <FileText className="absolute left-4 top-4 w-4 h-4 text-[#605A57] dark:text-gray-500 group-focus-within:text-accent transition-colors" />
+                    <textarea 
+                      placeholder="Tell us about your store..." 
+                      value={formData.description}
+                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                      rows={3}
+                      className="w-full pl-11 pr-4 py-3 bg-white/50 dark:bg-white/5 border border-[rgba(55,50,47,0.12)] dark:border-white/10 rounded-2xl outline-none focus:ring-2 focus:ring-accent/20 focus:border-accent transition-all text-sm font-medium resize-none"
+                    />
+                  </div>
+                </div>
+
+                {/* Email */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-[#605A57] dark:text-gray-500 ml-1">Email Address</label>
                   <div className="relative group">
@@ -109,6 +183,7 @@ export default function StoreRegistrationSection() {
                   </div>
                 </div>
 
+                {/* Password */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold uppercase tracking-widest text-[#605A57] dark:text-gray-500 ml-1">Password</label>
                   <div className="relative group">
@@ -148,16 +223,6 @@ export default function StoreRegistrationSection() {
               </form>
             </div>
 
-            {/* Floating badge */}
-            <div className="absolute -bottom-6 -right-6 glass p-4 rounded-2xl border border-[rgba(55,50,47,0.12)] dark:border-white/20 shadow-xl hidden sm:flex items-center gap-3 animate-bounce">
-              <div className="w-10 h-10 rounded-full bg-accent/20 flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5 text-accent" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[10px] font-bold text-[#37322F] dark:text-white uppercase tracking-wider">Enterprise Grade</span>
-                <span className="text-xs text-[#605A57] dark:text-gray-400">SOC2 Type II Compliant</span>
-              </div>
-            </div>
           </div>
 
         </div>

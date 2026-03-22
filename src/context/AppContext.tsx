@@ -12,7 +12,7 @@ interface AppContextType {
   transactions: Transaction[];
   notifications: any[];
   setStoreName: (name: string | null) => void;
-  registerStore: (name: string, email: string, password?: string) => Promise<void>;
+  registerStore: (name: string, email: string, password?: string, extra?: { ownerName?: string; phone?: string; address?: string; description?: string }) => Promise<void>;
   addStore: (store: Omit<Store, 'id' | 'code' | 'revenue' | 'transactions'>) => Promise<void>;
   updateStore: (id: string, updates: Partial<Store>) => Promise<void>;
   deleteStore: (id: string) => Promise<void>;
@@ -278,7 +278,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
     supabase.auth.signOut();
   }, [clearCart]);
 
-  const registerStore = async (name: string, email: string, password?: string) => {
+  const registerStore = async (name: string, email: string, password?: string, extra?: { ownerName?: string; phone?: string; address?: string; description?: string }) => {
     try {
       if (!password) {
         throw new Error('Password is required for registration.');
@@ -291,8 +291,6 @@ export function AppProvider({ children }: { children: ReactNode }) {
       });
 
       if (authErr && authErr.message.toLowerCase().includes('user already registered')) {
-        // Fallback to signIn if the user exists but hasn't mapped their store correctly 
-        // (usually happens during local dev testing after wiping the public tables)
         const { data: signInData, error: signInErr } = await supabase.auth.signInWithPassword({
           email,
           password
@@ -315,18 +313,32 @@ export function AppProvider({ children }: { children: ReactNode }) {
       const newStore: Store = {
         id: newStoreId,
         name,
-        location: 'TBA',
+        location: extra?.address || 'TBA',
         code: `NX-${Math.floor(1000 + Math.random() * 9000)}`,
         status: 'active',
         revenue: 0,
         transactions: 0
       };
 
+      const storeInsertPayload: any = { ...newStore, slug };
+      if (extra?.phone) storeInsertPayload.phone = extra.phone;
+      if (extra?.description) storeInsertPayload.description = extra.description;
+
       let storeErr = null;
-      const storeRes = await supabase.from('stores').insert([{ ...newStore, slug }]);
+      const storeRes = await supabase.from('stores').insert([storeInsertPayload]);
 
       if (storeRes.error) {
-        if (storeRes.error.code === 'PGRST204' || storeRes.error.message.includes('slug')) {
+        if (storeRes.error.message.includes('phone') || storeRes.error.message.includes('description')) {
+          // Columns don't exist yet — retry without them
+          const fallbackPayload: any = { ...newStore, slug };
+          const fbRes = await supabase.from('stores').insert([fallbackPayload]);
+          if (fbRes.error && (fbRes.error.code === 'PGRST204' || fbRes.error.message.includes('slug'))) {
+            const fbRes2 = await supabase.from('stores').insert([newStore]);
+            storeErr = fbRes2.error;
+          } else {
+            storeErr = fbRes.error;
+          }
+        } else if (storeRes.error.code === 'PGRST204' || storeRes.error.message.includes('slug')) {
           console.warn('Backend schema outdated. Falling back to insert without slug.');
           const fallbackRes = await supabase.from('stores').insert([newStore]);
           storeErr = fallbackRes.error;
@@ -337,10 +349,11 @@ export function AppProvider({ children }: { children: ReactNode }) {
       if (storeErr) throw storeErr;
 
       // 3. Create Staff profile for owner (admin)
-      const initials = name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
+      const ownerDisplayName = extra?.ownerName || 'Admin';
+      const initials = ownerDisplayName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
       const newStaff: StaffMember = {
         id: userId,
-        name: 'Admin',
+        name: ownerDisplayName,
         email,
         role: 'admin',
         status: 'active',
