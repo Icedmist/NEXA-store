@@ -127,7 +127,7 @@ export default function StoreRegistrationSection() {
                 <button 
                   type="submit"
                   disabled={loading}
-                  className="w-full h-13 mt-4 bg-primary text-primary-foreground rounded-2xl font-bold text-sm flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full h-16 mt-4 bg-primary text-primary-foreground rounded-2xl font-bold text-base flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all shadow-xl shadow-primary/10 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
