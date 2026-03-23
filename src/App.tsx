@@ -1,4 +1,4 @@
- import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -21,7 +21,6 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
-// A simple wrapper to read context
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { role } = useApp();
   if (!role) {
@@ -32,13 +31,18 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const AppRoutes = () => {
   const host = window.location.hostname;
-  const parts = host.split('.');
   
-  // Logic to redirect subdomains securely to the login portal
-  // We check if it's a subdomain (parts.length > 2) 
-  // BUT we ensure it's NOT your main production domain on Vercel.
-  const isStorePortal = (parts.length > 2 || (parts.length === 2 && host.includes('localhost') && parts[0] !== 'localhost')) 
-    && host !== 'nexa-store-six.vercel.app'; 
+  // FINAL REFINED LOGIC:
+  // We define exactly what the "Base" domains are. 
+  // Anything that is EXACTLY one of these is the main site.
+  const isMainSite = 
+    host === 'localhost' || 
+    host === 'nexa-store-six.vercel.app';
+
+  // A store portal is ONLY triggered if:
+  // 1. It is NOT the main site.
+  // 2. It has a subdomain (e.g., nasir.nexa-store-six.vercel.app).
+  const isStorePortal = !isMainSite && host.split('.').length > (host.includes('vercel.app') ? 3 : 2);
 
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
