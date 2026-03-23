@@ -72,16 +72,17 @@ export default function SettingsPage() {
   <div className="flex items-center justify-between bg-background border border-border p-3.5 rounded-xl shadow-inner">
     <div className="min-w-0 flex-1">
       <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider mb-1">Branded URL</p>
-      <div className="flex items-center gap-2 text-sm font-mono text-foreground truncate select-all">
+      <div className="flex items-center text-sm font-mono text-foreground truncate select-all">
         <span className="text-primary font-bold">http://</span>
-        {settings.storeName.toLowerCase().replace(/[^a-z0-9]/g, '')}.
-        <span className="text-muted-foreground">{window.location.host}</span>
+        <span className="text-muted-foreground">{window.location.host}/</span>
+        <span>{settings.storeName.toLowerCase().replace(/[^a-z0-9]/g, '')}</span>
+        <span className="text-muted-foreground">/login</span>
       </div>
     </div>
     <button 
       onClick={() => { 
         const slug = settings.storeName.toLowerCase().replace(/[^a-z0-9]/g, '');
-        navigator.clipboard.writeText(`http://${slug}.${window.location.host}`); 
+        navigator.clipboard.writeText(`http://${window.location.host}/${slug}/login`); 
         toast?.('Copied to clipboard'); 
       }} 
       className="ml-4 w-9 h-9 rounded-lg bg-primary/10 hover:bg-primary/20 flex items-center justify-center text-primary transition-colors flex-shrink-0" title="Copy URL"

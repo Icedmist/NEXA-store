@@ -1,5 +1,5 @@
- import { useApp } from '@/context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useApp } from '@/context/AppContext';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import { ArrowRight, Loader2, Mail, Lock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -14,27 +14,14 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [portalSlug, setPortalSlug] = useState<string | null>(null);
+  const { storeSlug } = useParams<{ storeSlug?: string }>();
+  const [portalSlug, setPortalSlug] = useState<string | null>(storeSlug || null);
 
   useEffect(() => {
-    const host = window.location.hostname;
-    const parts = host.split('.');
-    
-    // FINAL FIX: Explicitly ignore your main production domain and localhost
-    const isMainSite = 
-      host === 'localhost' || 
-      host === 'nexa-store-six.vercel.app';
-
-    if (!isMainSite) {
-      // Only detect a "Portal" if we aren't on the main marketing site
-      if (parts.length > (host.includes('vercel.app') ? 3 : 2)) {
-        const slug = parts[0];
-        if (slug !== 'www' && slug !== 'app') {
-          setPortalSlug(slug);
-        }
-      }
+    if (storeSlug) {
+      setPortalSlug(storeSlug);
     }
-  }, []);
+  }, [storeSlug]);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();

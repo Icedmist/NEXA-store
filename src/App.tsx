@@ -30,25 +30,12 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 };
 
 const AppRoutes = () => {
-  const host = window.location.hostname;
-  
-  // FINAL REFINED LOGIC:
-  // We define exactly what the "Base" domains are. 
-  // Anything that is EXACTLY one of these is the main site.
-  const isMainSite = 
-    host === 'localhost' || 
-    host === 'nexa-store-six.vercel.app';
-
-  // A store portal is ONLY triggered if:
-  // 1. It is NOT the main site.
-  // 2. It has a subdomain (e.g., nasir.nexa-store-six.vercel.app).
-  const isStorePortal = !isMainSite && host.split('.').length > (host.includes('vercel.app') ? 3 : 2);
-
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <Routes>
-        <Route path="/" element={isStorePortal ? <Navigate to="/login" replace /> : <Landing />} />
+        <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
+        <Route path="/:storeSlug/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
         <Route path="/inventory" element={<ProtectedRoute><Inventory /></ProtectedRoute>} />

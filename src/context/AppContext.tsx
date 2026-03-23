@@ -98,13 +98,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
           });
         }
         if (!userStoreId && typeof window !== 'undefined') {
-          const host = window.location.hostname;
-          const parts = host.split('.');
-          if (parts.length > 2 && parts[0] !== 'www' && parts[0] !== 'localhost') {
-            const { data: matchedStores } = await supabase.from('stores').select('*');
-            const matched = matchedStores?.find((s: any) => s.name.toLowerCase().replace(/\s+/g, '') === parts[0].toLowerCase());
-            if (matched) {
-              userStoreId = matched.id;
+          const pathParts = window.location.pathname.split('/').filter(Boolean);
+          if (pathParts.length > 0) {
+            const possibleSlug = pathParts[0];
+            if (possibleSlug !== 'www' && possibleSlug !== 'localhost') {
+              const { data: matchedStores } = await supabase.from('stores').select('*');
+              const matched = matchedStores?.find((s: any) => 
+                s.slug === possibleSlug || 
+                s.name.toLowerCase().replace(/\s+/g, '') === possibleSlug.toLowerCase()
+              );
+              if (matched) {
+                userStoreId = matched.id;
+              }
             }
           }
         }
