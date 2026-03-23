@@ -19,7 +19,7 @@ Scan with any smartphone camera — no dedicated laser hardware needed. Print A4
 Track sales by store, by payment method, by day — and export branded PDF reports for your accountant in one click.
 
 ---
-
+ 
 ## 👤 User Roles & Dashboard
 
 ### 👑 Administrator (Global Oversight)
