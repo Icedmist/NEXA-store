@@ -1,4 +1,4 @@
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -34,8 +34,11 @@ const AppRoutes = () => {
   const host = window.location.hostname;
   const parts = host.split('.');
   
-  // Logic to redirect subdomains securely to the login portal instead of the marketing landing page
-  const isStorePortal = parts.length > 2 || (parts.length === 2 && host.includes('localhost') && parts[0] !== 'localhost');
+  // Logic to redirect subdomains securely to the login portal
+  // We check if it's a subdomain (parts.length > 2) 
+  // BUT we ensure it's NOT your main production domain on Vercel.
+  const isStorePortal = (parts.length > 2 || (parts.length === 2 && host.includes('localhost') && parts[0] !== 'localhost')) 
+    && host !== 'nexa-store-six.vercel.app'; 
 
   return (
     <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
