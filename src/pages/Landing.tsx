@@ -14,6 +14,8 @@ import FooterSection from "../landing/footer-section"
 import { ModeToggle } from "@/components/ModeToggle"
 import { useTheme } from "next-themes"
 import StoreRegistrationSection from "../landing/store-registration"
+import OnboardingSection from "../landing/onboarding-section"
+
 
 // Hatched pattern side decoration
 function HatchedSide({ count = 50 }: { count?: number }) {
@@ -158,9 +160,13 @@ export default function LandingPage() {
                     <a href="#pricing" className="flex justify-start items-center">
                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] dark:text-gray-400 text-xs md:text-[13px] font-medium leading-[14px] font-sans cursor-pointer hover:text-[#37322F] dark:hover:text-white transition-colors">Pricing</div>
                     </a>
+                    <a href="#how-it-works" className="flex justify-start items-center">
+                      <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] dark:text-gray-400 text-xs md:text-[13px] font-medium leading-[14px] font-sans cursor-pointer hover:text-[#37322F] dark:hover:text-white transition-colors">Usage</div>
+                    </a>
                     <a href="#faq" className="flex justify-start items-center">
                       <div className="flex flex-col justify-center text-[rgba(49,45,43,0.80)] dark:text-gray-400 text-xs md:text-[13px] font-medium leading-[14px] font-sans cursor-pointer hover:text-[#37322F] dark:hover:text-white transition-colors">FAQ</div>
                     </a>
+
                   </div>
                 </div>
                 <div className="h-6 sm:h-7 md:h-8 flex justify-start items-start gap-2 sm:gap-3">
@@ -524,7 +530,9 @@ export default function LandingPage() {
               </div>
 
               {/* Remaining Sections */}
+              <OnboardingSection />
               <DocumentationSection />
+
               <TestimonialsSection />
               <PricingSection />
               <FAQSection />
